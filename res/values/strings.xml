@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, TodoGUIActivity!</string>
+    <string name="app_name">TASKMASTER</string>
+    <string name="priority">Priority</string>
+    <string name="estimate">Estimate</string>
+    <string name="deadline">Deadline</string>
+    <string name="plus">  +  </string>
+    <string name="minus">  -  </string>
+    <string name="dateSliderTitle">Select Date</string>
+
+    <string-array name="planets_array">
+        <item>Mercury</item>
+        <item>Venus</item>
+        <item>Earth</item>
+        <item>Mars</item>
+        <item>Jupiter</item>
+        <item>Saturn</item>
+        <item>Uranus</item>
+        <item>Neptune</item>
+    </string-array>
+
+    <string name="select_date">Select date and time</string>
+    <string name="impression">Impression</string>
+    <string name="body">Body</string>
+    <string name="duedate">Duedate </string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="recommend">empty time slots</string>
+    <string name="remove">X</string>
+    <string name="collaborators">Invited people</string>
+    <string name="done">Done</string>
+    <string name="find">Find</string>
+    <string name="add">Add</string>
+    <string name="invite">Invite</string>
+    <string name="username">user name</string>
+    <string name="decline">decline</string>
+
+    <!-- AuthenticatorActivity -->
+    <skip />
+    <!-- Label above username EditText -->
+    <string name="login_activity_username_label">Username</string>
+    <!-- Label above password EditText -->
+    <string name="login_activity_password_label">Password</string>
+    <!-- Label above email EditText -->
+    <string name="login_activity_email_label">Password</string>
+    <!-- Button to sign in after entering username and password -->
+    <string name="login_activity_ok_button">Sign in</string>
+
+    <!-- Message shown in dialog if the username or password is invalid. -->
+    <string name="login_activity_loginfail_text_both">The username or password isn\'t valid. A Sample SyncAdapter account is
+        required. Please try again. </string>
+    <!-- Message shown in dialog if the password is invalid -->
+    <string name="login_activity_loginfail_text_pwonly">You entered the wrong password or your account has changed.
+        Please re-enter your password.</string>
+    <!-- Message shown in dialog to prompt the user for their password -->
+    <string name="login_activity_loginfail_text_pwmissing">Type the password for this account.</string>
+    
+    <!-- Message shown in dialog to prompt the user for their email -->
+    <string name="login_activity_loginfail_text_emmissing">Type the email for this account.</string>
+
+    <!-- Label for this package -->
+    <string name="label">ToDo</string>
+
+    <!-- Message shown in progress dialog while app connects to the server -->
+    <string name="ui_activity_authenticating">Authenticating\u2026</string>
+
+    <!--
+        Message shown if the provided account doesn't support the current
+        activity.
+    -->
+    <string name="login_activity_newaccount_text">Sign in to your Sample SyncAdapter account. </string>
+    
+        <!-- Title string for Login activity -->
+    <string name="ui_activity_title">Sign-in</string>
+    <string name="email">email</string>
+    <string name="creator">Creator</string>
+    <string name="donations">Please Donate we are POOR !! :D</string>
+
+</resources>

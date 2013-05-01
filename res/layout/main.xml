@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <Button
+        android:id="@+id/showTasks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="60dp"
+        android:layout_marginTop="155dp"
+        android:text="show tasks" 
+        android:onClick="showTasks" />
+
+    <Button
+        android:id="@+id/NewTask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/showTasks"
+        android:layout_alignBottom="@+id/showTasks"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="57dp"
+        android:text="Add task" 
+        android:onClick="addTask"/>
+
+    <Button
+        android:id="@+id/BackLockTasks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/showTasks"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="67dp"
+        android:text="Back Lock Tasks" 
+        android:onClick="BackLogTasks"/>
+
+    <Button
+        android:id="@+id/ScheduleTasks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/BackLockTasks"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="22dp"
+        android:text="Schedule Tasks"
+        android:onClick="ScheduleTasks" />
+
+</RelativeLayout>

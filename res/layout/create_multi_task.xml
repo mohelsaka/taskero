@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+ 
+    
+
+        
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_bc"
+    android:orientation="vertical" >
+
+    
+<ScrollView 
+    android:id="@+id/ScrollViewParent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_alignParentLeft="true"
+    android:layout_toLeftOf="@+id/ScrollViewListofAddedTasks"
+    android:layout_above="@+id/AddTask"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:gravity="center"
+        android:layout_margin="10dp" 
+        android:orientation="vertical"
+        android:scrollbars="vertical" >
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/body"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/taskBody"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:gravity="top|left"
+            android:inputType="textMultiLine"
+            android:lines="5"
+            android:maxWidth="5.0dip"
+            android:minWidth="10.0dip"
+            android:scrollHorizontally="false" >
+
+            <requestFocus />
+        </EditText>
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="@string/priority"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <RatingBar
+            android:id="@+id/ratingBar1"
+            android:layout_width="244dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:numStars="5" />
+        
+        <HorizontalScrollView 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+        <LinearLayout  
+            android:id="@+id/ConstraintLayoutBefore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+                 
+            
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="35dp"
+            android:layout_marginLeft="15dp"
+            android:text="Before"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        
+            
+       
+        
+        </LinearLayout>
+        </HorizontalScrollView>
+        <HorizontalScrollView 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+        <LinearLayout  
+            android:id="@+id/ConstraintLayoutAfter"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_height="wrap_content">
+                 
+            
+        <TextView
+            android:id="@+id/textView006"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="35dp"
+            android:layout_marginLeft="15dp"
+            android:text="After   "
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        
+            
+       
+        
+        </LinearLayout>
+        </HorizontalScrollView>
+        <!--
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dip" >
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="0dip"
+                android:layout_height="fill_parent"
+                android:layout_marginLeft="10dip"
+                android:layout_weight="2"
+                android:paddingTop="10dip"
+                android:text="@string/estimate"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <com.example.widget.NumberPicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp" >
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:paddingLeft="5dp"
+                android:paddingTop="5dp"
+                android:text="@string/deadline"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Button
+                android:id="@+id/deadline"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:onClick="showDateDialog"
+                android:text="@string/select_date" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp" >
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:paddingLeft="5dp"
+                android:paddingTop="5dp"
+                android:text="@string/duedate"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Button
+                android:id="@+id/duedate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:onClick="showDateDialog"
+                android:text="@string/select_date" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" 
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp" >
+
+            <TextView
+                android:id="@+id/textView06"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:paddingLeft="5dp"
+                android:paddingTop="5dp"
+                android:text="Duration hrs."
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                
+                <EditText
+                    android:id="@+id/editText1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:ems="5"
+                    android:inputType="numberDecimal" />
+
+                
+            </RelativeLayout>
+        </LinearLayout>
+
+        
+    </LinearLayout>
+
+</ScrollView>
+
+<ScrollView android:id="@+id/ScrollViewListofAddedTasks"
+    android:layout_width="70dp"
+    android:layout_height="match_parent"
+    android:layout_above="@+id/AddTask"
+    android:layout_alignParentRight="true"
+    android:background="@drawable/gradient_bc"
+    >
+<LinearLayout
+    android:id="@+id/ListofAddedTasks"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:scrollbars="vertical" >
+    		
+           
+    
+</LinearLayout>
+</ScrollView>
+		<Button
+        android:id="@+id/AddTask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:textSize="30sp"
+        android:background="@drawable/gradient_bc"
+        android:text="  +  " />
+
+		<Button
+		    android:id="@+id/SaveAll"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_alignParentRight="true"
+		    android:layout_alignParentBottom="true"
+		    android:background="@drawable/gradient_bc"
+		    android:text="  Next  "
+		    android:textSize="30sp" />
+
+</RelativeLayout>
+

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Configuring the authenticator for the AccountManager. -->
+
+<account-authenticator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accountType="sak.todo.sync"
+    android:icon="@drawable/icon"
+    android:smallIcon="@drawable/icon"
+    android:label="@string/label"
+/>
