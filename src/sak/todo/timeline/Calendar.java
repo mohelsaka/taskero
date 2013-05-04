@@ -34,12 +34,17 @@ import org.anddev.andengine.input.touch.detector.ScrollDetector.IScrollDetectorL
 
 import sak.todo.database.Task;
 import sak.todo.database.TasksIterator;
+import sak.todo.gui.CreateMultiTaskActivityUpdated;
+import sak.todo.gui.R;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 /**
  * @author mohamed elsaka
@@ -521,5 +526,24 @@ public class Calendar extends BaseGameActivity implements
 			tasks.add(t);
 		
 		return tasks;
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.calendar_menu, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+	    switch (item.getItemId()) {
+	        case R.id.creat_multitask_item:
+	        	startActivity(new Intent(this, CreateMultiTaskActivityUpdated.class));
+	        	return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
 	}
 }
