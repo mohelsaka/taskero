@@ -36,7 +36,7 @@ public class Intro extends Activity {
 				new Intent(this,CreateMeeting.class),
 				new Intent(this,CreateMultiTaskActivityUpdated.class),
 				new Intent(this,ShowTasksActivity.class),
-				new Intent(this,donationsActivity.class),
+				new Intent(this,SchedulesActivity.class),
 			} ;
 //		AccountManager accountManager = AccountManager.get(this);
 //		Account ac[] = accountManager.getAccountsByType(Constants.ACCOUNT_TYPE);

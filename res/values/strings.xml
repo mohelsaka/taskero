@@ -80,4 +80,12 @@
 	
     <!-- Title for menu items -->
     <string name="create_multitask_item">Add Tasks</string>
+    
+    <string name="schdule_1">schdule#1</string>
+    <string name="schdule_2">schdule#2</string>
+    <string name="schdule_3">schdule#3</string>
+    <string name="schdule_4">schdule#4</string>
+    <string name="schdule_manual">manual</string>
+    
+    <color name="tabsColor">#FFAA99</color>
 </resources>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/schedule1" 
+        android:title="@string/schdule_1"
+        android:showAsAction="ifRoom" ></item>
+    
+    <item android:id="@+id/schedule2" 
+        android:title="@string/schdule_2"
+        android:showAsAction="ifRoom" ></item>
+    
+    <item android:id="@+id/schedule3" 
+        android:title="@string/schdule_3"
+        android:showAsAction="ifRoom" ></item>
+    
+    <item android:id="@+id/schedule4" 
+        android:title="@string/schdule_4"
+        android:showAsAction="ifRoom" ></item>
+    
+    <item android:id="@+id/schedule_manual" android:title="@string/schdule_manual"></item>
+</menu>

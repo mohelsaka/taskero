@@ -44,6 +44,7 @@
         <activity android:name="CreateTaskActivity"></activity>
         <activity android:name="CreateMeeting"></activity>
         <activity android:name="ShowTasksActivity"></activity>
+        <activity android:name="SchedulesActivity"></activity>
             <!-- The authenticator service -->
         <service
             android:name="sak.todo.syncmgr.AccountAuthenticatorService"
