@@ -36,18 +36,8 @@ public class TasksListActivity extends ListActivity implements TabListener{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-
 		// requesting action bar feature
 		getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-		
-		// setup action bar for tabs
-	    ActionBar actionBar = getActionBar();
-	    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-//	    actionBar.setDisplayShowTitleEnabled(false);
-//	    actionBar.setHomeButtonEnabled(false);
-//	    actionBar.setDisplayShowTitleEnabled(false);
-//	    actionBar.setDisplayShowHomeEnabled(false);
-//	    actionBar.setStackedBackgroundDrawable(new ColorDrawable(R.color.tabsColor));
 		
 	    setContentView(R.layout.tasks_list);
 

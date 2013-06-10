@@ -8,6 +8,7 @@ import java.util.Vector;
 
 import sak.todo.database.Task;
 import sak.todo.database.TasksIterator;
+import sak.todo.gui.schedules.SchedulesActivity;
 import taskero.learner.Preference_Learner;
 import android.app.Activity;
 import android.app.Dialog;
@@ -53,19 +54,14 @@ public class CreateMultiTaskActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.create_multi_task);
-		bodyView = (EditText) this.findViewById(R.id.ScrollViewParent)
-				.findViewById(R.id.taskBody);
-		priorityView = (RatingBar) this.findViewById(R.id.ScrollViewParent)
-				.findViewById(R.id.ratingBar1);
-		estimateView = (EditText) this.findViewById(R.id.ScrollViewParent)
-				.findViewById(R.id.editText1);
-		deadLineView = (Button) this.findViewById(R.id.ScrollViewParent)
-				.findViewById(R.id.deadline);
-		dueDateView = (Button) this.findViewById(R.id.ScrollViewParent)
-				.findViewById(R.id.duedate);
+		
+		bodyView = (EditText) this.findViewById(R.id.ScrollViewParent).findViewById(R.id.taskBody);
+		priorityView = (RatingBar) this.findViewById(R.id.ScrollViewParent).findViewById(R.id.ratingBar1);
+		estimateView = (EditText) this.findViewById(R.id.ScrollViewParent).findViewById(R.id.editText1);
+		deadLineView = (Button) this.findViewById(R.id.ScrollViewParent).findViewById(R.id.deadline);
+		dueDateView = (Button) this.findViewById(R.id.ScrollViewParent).findViewById(R.id.duedate);
 
 		sharedPrefs = getSharedPreferences(PREFS_NAME, 0);
 
@@ -75,16 +71,19 @@ public class CreateMultiTaskActivity extends Activity {
 		listofAddedTasks = ((LinearLayout) findViewById(R.id.ListofAddedTasks));
 		listofConstraintBefore = ((LinearLayout) findViewById(R.id.ConstraintLayoutBefore));
 		listofConstraintAfter = ((LinearLayout) findViewById(R.id.ConstraintLayoutAfter));
+		
 		TextView taskBefore = (TextView) LayoutInflater.from(
 				CreateMultiTaskActivity.this).inflate(R.drawable.task,
 				null);
 		TextView taskAfter = (TextView) LayoutInflater.from(
 				CreateMultiTaskActivity.this).inflate(R.drawable.task,
 				null);
+		
 		taskBefore.setBackgroundResource(R.drawable.shape_clicked);
 		taskAfter.setBackgroundResource(R.drawable.shape_clicked);
 		taskBefore.setText(" ADD ");
 		taskAfter.setText(" ADD ");
+		
 		listofConstraintBefore.addView(taskBefore);
 		listofConstraintAfter.addView(taskAfter);
 
@@ -94,18 +93,18 @@ public class CreateMultiTaskActivity extends Activity {
 		addedTasks = new ArrayList<Task>();
 		addedTasks.add(Task.NULLTASK);
 		parentTask = new Task();
+		
 		findViewById(R.id.SaveAll).setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Log.d("debug", "Save alll ........... ");
 
-				TasksIterator itr = Task.getScheduledTasks(
-						new Date(System.currentTimeMillis()), new Date(
-								Reasoner.INFINITY));
+				TasksIterator itr = Task.getScheduledTasks(new Date(System.currentTimeMillis()), new Date(Reasoner.INFINITY));
 				Task task = itr.nextTask();
 				while (task != null) {
 					addedTasks.add(task);
 					task = itr.nextTask();
 				}
+
 				Reasoner reasoner = Reasoner.instance();
 
 				ArrayList<ArrayList<Task>> assignments;
@@ -118,20 +117,16 @@ public class CreateMultiTaskActivity extends Activity {
 						svmAdapter = new SVMAdapter(getApplicationContext());
 
 						int numOfRuns = sharedPrefs.getInt("numberOfRuns", 0);
-						Preference_Learner pl = Preference_Learner.getInstance(
-								assignments, svmAdapter, numOfRuns);
+						Preference_Learner pl = Preference_Learner.getInstance(assignments, svmAdapter, numOfRuns);
 						try {
 							svmAdapter.init();
-							assignments = pl.rank(pl
-									.setcalenderFeatVector(assignments));
+							assignments = pl.rank(pl.setcalenderFeatVector(assignments));
 
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 
 					} catch (NameNotFoundException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 
@@ -144,29 +139,22 @@ public class CreateMultiTaskActivity extends Activity {
 						}
 						Log.d("debug", "-----------------------");
 					}
-					Intent intent = new Intent(
-							CreateMultiTaskActivity.this,
-							SchedulesActivity.class);
-					// ArrayList<? extends Parcelable> a = (ArrayList<? extends
-					// Parcelable>) assignments;
+					
+					Intent intent = new Intent(CreateMultiTaskActivity.this, SchedulesActivity.class);
 					intent.putExtra("assignments", assignments);
 
 					startActivity(intent);
-					//
 
 				} catch (STPNotConnsistentException e) {
-					// TODO Auto-generated catch block
 					Toast.makeText(getApplicationContext(),
 							"Constraints you entered are not consistent",
 							Toast.LENGTH_LONG).show();
 				}
-				//
 			}
 		});
 		findViewById(R.id.AddTask).setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 
 				final TextView task = (TextView) LayoutInflater.from(
 						CreateMultiTaskActivity.this).inflate(

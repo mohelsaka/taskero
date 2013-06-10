@@ -3,6 +3,7 @@ package sak.todo.gui;
 
 import sak.todo.constants.Constants;
 import sak.todo.database.DBHelper;
+import sak.todo.gui.schedules.SchedulesActivity;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;

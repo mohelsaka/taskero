@@ -530,7 +530,9 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 	
 	@Override
 	public Task clone() throws CloneNotSupportedException {
-		return new Task((Date)this.duedate.clone(), this.estimate, this.body, this.id);
+		Task t = new Task((Date)this.duedate.clone(), this.estimate, this.body, this.id);
+		t.priority = this.priority;
+		return t;
 	}
 
 	public Task(Parcel in) {
