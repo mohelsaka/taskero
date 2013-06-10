@@ -19,6 +19,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * This class represents the task and provides all functionalities to manipulate
@@ -318,6 +319,26 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 		Cursor c = db.rawQuery(sql, new String[] {});
 		c.moveToFirst();
 		return new TasksIteratorImp(c, db);
+	}
+	
+	public static Cursor getAllTasksPointedAtToday(){
+		SQLiteDatabase db = DBHelper.instance.getReadableDatabase();
+		String duedate = DBHelper.TASK_ATTR_NAMES[DBHelper.COLUMN_DUE_DATE_NUM];
+		String sql = "select * from " + DBHelper.TABLE_TASKS + " where "
+				+ duedate + " != 0 " + " order by duedate ASC;";
+		
+		Cursor c = db.rawQuery(sql, new String[] {});
+		
+		// set the cursor to be at the tasks of today
+		sql = "select * from " + DBHelper.TABLE_TASKS + " where "
+				+ duedate + " < ?  ;";
+		
+		Cursor oldTasks = db.rawQuery(sql, new String[] {"" + System.currentTimeMillis()});
+		
+		int numOfOldTasks = oldTasks.getCount();
+		c.move(numOfOldTasks);
+		
+		return c;
 	}
 
 	/**

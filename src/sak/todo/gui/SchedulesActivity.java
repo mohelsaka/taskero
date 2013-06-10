@@ -76,7 +76,7 @@ public class SchedulesActivity extends Activity implements TabListener{
 		// Handle item selection
 	    switch (item.getItemId()) {
 	        case R.id.creat_multitask_item:
-	        	startActivity(new Intent(this, CreateMultiTaskActivityUpdated.class));
+	        	startActivity(new Intent(this, CreateMultiTaskActivity.class));
 	        	return true;
 	        default:
 	            return super.onOptionsItemSelected(item);

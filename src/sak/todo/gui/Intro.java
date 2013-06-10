@@ -31,11 +31,11 @@ public class Intro extends Activity {
 		DBHelper.initialize(this);
 		
 		intents=new Intent[]{
-				new Intent(this,sak.todo.timeline.Calendar.class),
+//				new Intent(this,sak.todo.timeline.Calendar.class),
 				new Intent(this,CreateTaskActivity.class),
-				new Intent(this,CreateMeeting.class),
-				new Intent(this,CreateMultiTaskActivityUpdated.class),
-				new Intent(this,ShowTasksActivity.class),
+//				new Intent(this,CreateMeeting.class),
+				new Intent(this,CreateMultiTaskActivity.class),
+//				new Intent(this,ShowTasksActivity.class),
 				new Intent(this,SchedulesActivity.class),
 			} ;
 //		AccountManager accountManager = AccountManager.get(this);
