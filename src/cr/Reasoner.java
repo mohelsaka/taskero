@@ -1,9 +1,12 @@
 package cr;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
-
-import sak.todo.database.Task;
 
 public class Reasoner {
 
@@ -26,6 +29,13 @@ public class Reasoner {
 			throws STPNotConnsistentException {
 		this.tasks = tasks;
 		stp = new long[tasks.size()][tasks.size()];
+		int n = stp.length;
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < n; j++)
+				if (i == j)
+					stp[i][j] = 0;
+//				else if (stp[i][j] == 0)
+//					stp[i][j] = INFINITY;
 		for (int i = 0; i < tasks.size(); i++) {
 			Task task = tasks.get(i);
 			for (int k = 0; k < task.before.size(); k++) {
@@ -61,27 +71,27 @@ public class Reasoner {
 
 	long[][] solveSTP() {
 		int n = stp.length;
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < n; j++)
-				if (i == j)
-					stp[i][j] = 0;
-		// else if (stp[i][j] == 0)
-		// stp[i][j] = INFINITY;
+		
+		for (int l = 0; l < stp.length; l++) {
+			for (int m = 0; m < stp.length; m++)
+				System.out.print(stp[l][m] + "   ");
+			System.out.println();
+		}
 		for (int k = 0; k < n; k++) {
 			System.out.println("using " + k);
 			for (int i = 0; i < n; i++)
 				for (int j = 0; j < n; j++) {
-					if (i != j && !(stp[i][k] == INFINITY || stp[k][j] == INFINITY))
+					if (!(stp[i][k] == INFINITY || stp[k][j] == INFINITY))
 						stp[i][j] = Math.min(stp[i][k] + stp[k][j]
 								+ (long) tasks.get(k).estimate * 60 * 60000,
 								stp[i][j]);
 					// }
-					for (int l = 0; l < stp.length; l++) {
-						for (int m = 0; m < stp.length; m++)
-							System.out.print(stp[l][m] + "   ");
-						System.out.println();
-					}
 				}
+			for (int l = 0; l < stp.length; l++) {
+				for (int m = 0; m < stp.length; m++)
+					System.out.print(stp[l][m] + "   ");
+				System.out.println();
+			}
 		}
 		for (int i = 0; i < n; i++)
 			if (stp[i][i] < 0)
@@ -107,8 +117,12 @@ public class Reasoner {
 			long now = 0;
 			for (int i = 1; i < stp.length; i++) {
 				int j = findMinDeadLine(current, mul);
+//				System.out.println(j);
 				Task t = tasks.get(j).clone();
-				long add = mul * (stp[current][j] + stp[j][current]) / count;
+				long add = mul * (stp[current][j] - Math.abs(stp[j][current])) / count;
+				System.out.println(add);
+				System.out.println(Math.abs(stp[j][current]));
+				System.out.println(new Date(now));
 				t.setDueDate(new Date(now + Math.abs(stp[j][current]) + add));
 				assignment.add(t);
 				visited[j] = true;
@@ -123,19 +137,28 @@ public class Reasoner {
 	}
 
 	int findMinDeadLine(int source, int mul) {
-		Long min = INFINITY;
+		long min = INFINITY;
 		int minIndex = -1;
 		for (int i = 1; i < stp.length; i++) {
 			Date l = tasks.get(i).deadline;
-			System.out.println(l);
+			// System.out.println(l);
 			if (!visited[i] && min >= l.getTime() && stp[source][i] >= 0) { // stp[source][i]
-																	// to be
-																	// sure we
-																	// can
-																	// go there
-																	// from here
-				minIndex = i;
-				min = tasks.get(i).deadline.getTime();
+				// to be
+				// sure we
+				// can
+				// go there
+				// from here
+				boolean b = true;
+				for (int j = 0; j < stp.length; j++) {
+					if (stp[j][i] > stp[i][j] && !visited[j]){
+						b = false;
+						break;
+					}
+				}
+				if (b) {
+					minIndex = i;
+					min = tasks.get(i).deadline.getTime();
+				}
 			}
 		}
 		return minIndex;
@@ -148,39 +171,60 @@ public class Reasoner {
 		return -1;
 	}
 
-	public static void main(String[] args) {
-		System.out.println("time now is "
-				+ new Date(System.currentTimeMillis()));
+	public static void main(String[] args) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader("tests.txt"));
+		String line = reader.readLine();
 		ArrayList<Task> tasks = new ArrayList<Task>();
-		tasks.add(Task.NULLTASK);
-		tasks.add(new Task("task 1", 1, new Date(2013 - 1900, 3, 30, 13, 0)));
-		tasks.add(new Task("task 2", 1, new Date(2013 - 1900, 3, 30, 15, 0)));
-		tasks.add(new Task("task 3", 1, new Date(2013 - 1900, 3, 30, 17, 0)));
-		tasks.add(new Task("task 4", 1, new Date(2013 - 1900, 3, 30, 19, 0)));
-		tasks.add(new Task("task 5", 1, new Date(2013 - 1900, 3, 30, 21, 0)));
-		tasks.get(1).addAfter(tasks.get(2),
-				new Interval(15 * 60 * 1000, 15 * 60 * 1000));
-		Task.NULLTASK = null;
-		System.out.println(tasks.get(0));
-		// new Reasoner(tasks);
-		// tasks.get(3).addBefore(tasks.get(4), new Interval(1, 2));
-		// tasks.get(4).addAfter(tasks.get(5), new Interval(2, 5));
-		// tasks.get(5).addAfter(tasks.get(6), new Interval(6, 9));
-
-		try {
-			Reasoner r = Reasoner.instance();
-			ArrayList<ArrayList<Task>> assignments = r.schedule(tasks);
-			for (ArrayList<Task> arrayList : assignments) {
-				System.out.println("other assignment");
-				for (Task task : arrayList) {
-					System.out.println(task);
-				}
+		PrintWriter writer = new PrintWriter(new File("result.txt"));
+		int z = 0;
+		while (line != null) {
+			tasks.clear();
+			 Task.NULLTASK = new Task(null, 0);
+			 tasks.add(Task.NULLTASK);
+			String[] taskInfo = line.split(",");
+			for (String string : taskInfo) {
+				System.out.println(string);
+				String[] splits = string.split(":");
+				String[] dateInfo = splits[2].split("/");
+				tasks.add(new Task("task " + splits[0], Float
+						.parseFloat(splits[1]), new Date(Integer
+						.parseInt(dateInfo[2]) - 1900, Integer
+						.parseInt(dateInfo[1]), Integer.parseInt(dateInfo[0]),
+						Integer.parseInt(dateInfo[3]), Integer
+								.parseInt(dateInfo[4]), Integer
+								.parseInt(dateInfo[5]))));
 			}
-		} catch (STPNotConnsistentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			line = reader.readLine();
+			while (!line.equals("****")) {
+				System.out.println(line);
+				String[] constraints = line.split("-");
+				tasks.get(Integer.parseInt(constraints[0])).addAfter(
+						tasks.get(Integer.parseInt(constraints[1])),
+						new Interval(60 * 60000*(Long.parseLong(constraints[2])),
+								constraints[3].equals("inf") ? INFINITY : 60 * 60000*(Long
+										.parseLong(constraints[3]))));
+				line = reader.readLine();
+			}
+			line = reader.readLine();
+			try {
+				Reasoner r = Reasoner.instance();
+				ArrayList<ArrayList<Task>> assignments = r.schedule(tasks);
+				writer.write("test case "+z++);
+				for (ArrayList<Task> arrayList : assignments) {
+					writer.write("other assignment\n");
+					System.out.println("other assignment");
+					for (Task task : arrayList) {
+						System.out.println(task);
+						writer.write(task.toString()+"\n");
+					}
+				}
+			} catch (STPNotConnsistentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
+		writer.close();
 	}
 
 }
