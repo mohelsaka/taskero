@@ -35,20 +35,12 @@ public class TasksListAdapter extends ArrayAdapter<Task>{
 		TextView body =  (TextView)layout.findViewById(R.id.task_body);
 		body.setText(t.body);
 		
-		TextView dueDatae =  (TextView)layout.findViewById(R.id.task_date);
+		TextView dueDate =  (TextView)layout.findViewById(R.id.task_date);
 		Calendar c = Calendar.getInstance();
 		long duedate = t.duedate.getTime();
 		c.setTimeInMillis(duedate);
 		
-		String s = String.format("%s %s %d %2d:%2d %s",
-				c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US),
-				c.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US),
-				c.get(Calendar.DAY_OF_MONTH),
-				c.get(Calendar.HOUR),
-				c.get(Calendar.MINUTE),
-				c.getDisplayName(Calendar.AM_PM, Calendar.SHORT, Locale.US)
-				);
-		dueDatae.setText(s);
+		dueDate.setText(Task.getFormatedDate(c));
 		
 		LinearLayout taskPrioityLabel = (LinearLayout)layout.findViewById(R.id.task_priority_label);
 		int priorty = t.priority;

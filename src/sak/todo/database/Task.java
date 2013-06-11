@@ -5,7 +5,9 @@
 package sak.todo.database;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Vector;
 
 import cr.Interval;
@@ -590,5 +592,16 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 	}
 	public Date getEndDate() {
 		return end;
+	}
+	
+	public static String getFormatedDate(Calendar c){
+		return String.format("%s %s %d %2d:%2d %s",
+				c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US),
+				c.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US),
+				c.get(Calendar.DAY_OF_MONTH),
+				c.get(Calendar.HOUR),
+				c.get(Calendar.MINUTE),
+				c.getDisplayName(Calendar.AM_PM, Calendar.SHORT, Locale.US)
+				);
 	}
 }

@@ -57,6 +57,19 @@ public class TasksListActivity extends ListActivity implements TabListener{
 	}
 	
 	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		Cursor cursor = Task.getAllTasksPointedAtToday();
+		int position = cursor.getPosition();
+		
+		TasksAgendaAdapter dataAdapter = new TasksAgendaAdapter(this, cursor, false);
+
+		getListView().setAdapter(dataAdapter);
+		getListView().setSelection(position);
+	}
+	
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.main_menu, menu);

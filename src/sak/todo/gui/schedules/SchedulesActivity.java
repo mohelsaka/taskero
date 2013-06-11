@@ -2,20 +2,28 @@ package sak.todo.gui.schedules;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Random;
+
+import com.googlecode.android.widgets.DateSlider.DateSlider;
+import com.googlecode.android.widgets.DateSlider.DateTimeSlider;
 
 import sak.todo.database.Task;
 import sak.todo.gui.R;
 import sak.todo.gui.R.color;
 import sak.todo.gui.R.id;
 import sak.todo.gui.R.layout;
+import sak.todo.gui.agenda.TasksListActivity;
 import android.app.ActionBar;
 import android.app.ActionBar.TabListener;
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.FragmentTransaction;
 import android.app.ActionBar.Tab;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.Camera.Size;
 import android.os.Bundle;
@@ -23,15 +31,25 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class SchedulesActivity extends Activity implements TabListener{
+public class SchedulesActivity extends Activity implements TabListener, OnItemClickListener{
 	ArrayList<ArrayList<Task>> assignments;
 	TasksListAdapter[] adapters;
 	
 	ListView tasksList;
+	
+	DateTimeSlider dateTimeSlider; //  using single instance of dateTimeSlider instead of creating new ones.
+	Calendar tmpCalendar; // use single instance of the calendar instead of creating new ones.
+	
+	// index of the currently selected schedule
+	int currentScheduleIndex = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,11 +73,11 @@ public class SchedulesActivity extends Activity implements TabListener{
 		if(b != null && ((assignmentsObject = b.get("assignments")) != null))
 			assignments = (ArrayList<ArrayList<Task>>) assignmentsObject;
 		
-		buildRedundantAssignments();
+//		buildRedundantAssignments();
 		
 		setContentView(R.layout.schedules_layout);
 		tasksList = (ListView)findViewById(R.id.tasksList);
-
+		
 		if(assignments == null){
 			// something went wrong and this activity should be ended
 			Toast.makeText(this, "Assignmets are null", Toast.LENGTH_LONG).show();
@@ -79,6 +97,14 @@ public class SchedulesActivity extends Activity implements TabListener{
 				}
 			}
 		}
+		
+		// Give a hint about how to manually assign due dates
+		Toast t = Toast.makeText(this, "Click on any task to manually assign due date.", Toast.LENGTH_LONG);
+		t.show();
+		
+		// preparing date time slider dialog
+		tmpCalendar = Calendar.getInstance();
+		dateTimeSlider = new DateTimeSlider(this, mDateTimeSetListener, tmpCalendar);
 	}
 	
 	private void loadAssignment(int assignmentIndex){
@@ -88,8 +114,12 @@ public class SchedulesActivity extends Activity implements TabListener{
 					R.id.task_body, assignments.get(assignmentIndex)); 
 		}
 		
-		// setting the new adatper
+		// updating index of the current schedule
+		currentScheduleIndex = assignmentIndex;
+		
+		// setting the new adapter
 		tasksList.setAdapter(adapters[assignmentIndex]);
+		tasksList.setOnItemClickListener(this);
 	}
 	
 	private void buildRedundantAssignments(){
@@ -144,15 +174,74 @@ public class SchedulesActivity extends Activity implements TabListener{
 	
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	public void onTabSelected(Tab tab, FragmentTransaction ft) {
+		// call loadAssingment to load the assignment pointed by this tab
 		loadAssignment(tab.getPosition());
 	}
 
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void onItemClick(AdapterView<?> arg0, View view, int arg2, long arg3) {
+		TasksListAdapter adapter = (TasksListAdapter) arg0.getAdapter();
+		
+		// set the task and its view that will be updated after the dialog returns
+		currentlyUpdatedTask = adapter.getItem(arg2);
+		currentlyUpdatedTextView = (TextView)view.findViewById(R.id.task_date);
+		
+		// initialize date time slider with the the time of that task
+		tmpCalendar.setTime(currentlyUpdatedTask.duedate);
+		// DEFECT: calendar is not updated :(
+		dateTimeSlider.updateCalendar(tmpCalendar);
+		
+		// display the date time slider
+		dateTimeSlider = new DateTimeSlider(this, mDateTimeSetListener, tmpCalendar);
+		dateTimeSlider.show();
+	}
+	
+	private Task currentlyUpdatedTask;
+	private TextView currentlyUpdatedTextView;
+	
+	private final DateSlider.OnDateSetListener mDateTimeSetListener = new DateSlider.OnDateSetListener() {
+		public void onDateSet(DateSlider view, Calendar selectedDate) {
+			// update the dateText view with the corresponding date
+			final int minute = (selectedDate.get(Calendar.MINUTE) / DateTimeSlider.MINUTEINTERVAL)
+					* DateTimeSlider.MINUTEINTERVAL;
+			
+			// avoid fractions of minutes and seconds
+			selectedDate.set(Calendar.MINUTE, minute);
+			selectedDate.set(Calendar.SECOND, 0);
+
+			currentlyUpdatedTask.duedate = selectedDate.getTime();
+			currentlyUpdatedTextView.setText(Task.getFormatedDate(selectedDate));
+			
+			currentlyUpdatedTextView.setTextColor(Color.RED);
+		}
+	};
+	
+	/**
+	 * This is function is called when the user hits 'Accept' button.
+	 * It updates the due date of tasks in current schedule which the user has accepted.
+	 * */
+	public void acceptSchedule(View view){
+		ArrayList<Task> schedule = assignments.get(currentScheduleIndex);
+		
+		Iterator<Task> it = schedule.iterator();
+		while (it.hasNext()) {
+			Task task = (Task) it.next();
+			
+			// saving the task will save it due date too
+			// TODO: update only due date if performance degradation has encountered
+			task.save();
+		}
+		
+		// end this activity and back to the main activity
+		Intent i = new Intent(null, TasksListActivity.class);
+		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // setting this flag will cause intermediate activities to finish
+		startActivity(i);
 	}
 }
