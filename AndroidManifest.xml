@@ -17,6 +17,10 @@
        <activity
             android:name="sak.todo.gui.agenda.TasksListActivity"
             android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
        <activity
@@ -26,10 +30,6 @@
         
         
         <activity android:name="sak.todo.gui.schedules.SchedulesActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         
         <activity android:name="CreateMultiTaskActivity" >
