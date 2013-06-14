@@ -101,6 +101,8 @@ public class CreateMultiTaskActivity extends Activity {
 				TasksIterator itr = Task.getScheduledTasks(new Date(System.currentTimeMillis()), new Date(Reasoner.INFINITY));
 				Task task = itr.nextTask();
 				while (task != null) {
+					Interval i = new Interval(task.duedate.getTime(), task.duedate.getTime());
+					Task.NULLTASK.addAfter(task, i);
 					addedTasks.add(task);
 					task = itr.nextTask();
 				}
