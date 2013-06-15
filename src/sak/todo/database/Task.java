@@ -18,6 +18,7 @@ import sak.todo.database.DBHelper;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
@@ -604,4 +605,6 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 				c.getDisplayName(Calendar.AM_PM, Calendar.SHORT, Locale.US)
 				);
 	}
+	
+	public static final int[] PRIORITY_COLORS = new int[]{Color.rgb(185, 255, 255), Color.rgb(205, 255, 255), Color.rgb(147, 100, 255)};
 }

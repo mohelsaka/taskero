@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import sak.todo.database.DBHelper;
+import sak.todo.database.Task;
 import sak.todo.gui.R;
 import android.R.color;
 import android.content.Context;
@@ -27,7 +28,7 @@ public class TasksAgendaAdapter extends CursorAdapter{
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 		LinearLayout layout = (LinearLayout) view;
-		TextView body =  (TextView)layout.findViewById(R.id.task_body);
+		final TextView body =  (TextView)layout.findViewById(R.id.task_body);
 		body.setText(cursor.getString(DBHelper.COLUMN_BODY_NUM));
 		
 		TextView dueDatae =  (TextView)layout.findViewById(R.id.task_date);
@@ -35,20 +36,11 @@ public class TasksAgendaAdapter extends CursorAdapter{
 		long duedate = cursor.getLong(DBHelper.COLUMN_DUE_DATE_NUM);
 		c.setTimeInMillis(duedate);
 		
-		String s = String.format("%s %s %d %2d:%2d %s",
-				c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US),
-				c.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US),
-				c.get(Calendar.DAY_OF_MONTH),
-				c.get(Calendar.HOUR),
-				c.get(Calendar.MINUTE),
-				c.getDisplayName(Calendar.AM_PM, Calendar.SHORT, Locale.US)
-				);
-		dueDatae.setText(s);
+		dueDatae.setText(Task.getFormatedDate(c));
 		
 		LinearLayout taskPrioityLabel = (LinearLayout)layout.findViewById(R.id.task_priority_label);
 		int priorty = cursor.getInt(DBHelper.COLUMN_PRIORITY_NUM);
-		int color = Color.rgb(25 * priorty, 25 * priorty, 25 * priorty);
-		taskPrioityLabel.setBackgroundColor(color);
+		taskPrioityLabel.setBackgroundColor(Task.PRIORITY_COLORS[priorty]);
 		
 		float duration = cursor.getFloat(DBHelper.COLUMN_ESTIMATE_NUM);
 		TextView durationView = (TextView) layout.findViewById(R.id.task_duration);
@@ -59,6 +51,13 @@ public class TasksAgendaAdapter extends CursorAdapter{
 		}else{
 			layout.setBackgroundColor(Color.WHITE);
 		}
+		
+//		layout.setOnClickListener(new View.OnClickListener() {
+//			
+//			public void onClick(View v) {
+//				body.setText("This is a very very very very long discreption fot this task what a ver y very very very very very very very very very very long task");
+//			}
+//		});
 	}
 
 	@Override
@@ -66,6 +65,5 @@ public class TasksAgendaAdapter extends CursorAdapter{
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         return inflater.inflate(R.layout.task_list_item, null);
 	}
-
-
+	
 }

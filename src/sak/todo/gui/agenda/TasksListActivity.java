@@ -13,6 +13,7 @@ import sak.todo.gui.R;
 import android.app.ActionBar;
 import android.app.ActionBar.TabListener;
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.FragmentTransaction;
 import android.app.ListActivity;
 import android.app.TimePickerDialog;
@@ -24,13 +25,16 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-public class TasksListActivity extends ListActivity implements TabListener{
+public class TasksListActivity extends ListActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,15 +49,17 @@ public class TasksListActivity extends ListActivity implements TabListener{
 
 //		deleteAllTasks();
 //		createSomeTasks();
-//		updatePrioirties();
+		updatePrioirties();
 		
 		Cursor cursor = Task.getAllTasksPointedAtToday();
 		int position = cursor.getPosition();
 		
 		TasksAgendaAdapter dataAdapter = new TasksAgendaAdapter(this, cursor, false);
 
-		getListView().setAdapter(dataAdapter);
-		getListView().setSelection(position);
+		ListView list = getListView();
+		list.setAdapter(dataAdapter);
+		list.setSelection(position);
+		list.setOnItemLongClickListener(longClickListener);
 	}
 	
 	@Override
@@ -94,7 +100,7 @@ public class TasksListActivity extends ListActivity implements TabListener{
 		Task t = null;
 		Random r = new Random();
 		while ((t = it.nextTask()) != null) {
-			t.priority = Math.abs(r.nextInt()) % 10;
+			t.priority = Math.abs(r.nextInt()) % 3 ;
 			t.save();
 		}
 	}
@@ -152,19 +158,37 @@ public class TasksListActivity extends ListActivity implements TabListener{
 			t.delete();
 		}
 	}
+	
+	OnItemLongClickListener longClickListener = new OnItemLongClickListener() {
 
-	public void onTabReselected(Tab tab, FragmentTransaction ft) {
-		// TODO Auto-generated method stub
+		public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+				int index, long arg3) {
+			selectedTaskIndex = index;
+			DialogFragment dialog = new TaskActionsDialog();
+			dialog.show(getFragmentManager(), "tasks_actions");
+			return true;
+		}
 		
-	}
-
-	public void onTabSelected(Tab tab, FragmentTransaction ft) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-		// TODO Auto-generated method stub
-		
-	}
+	};
+	
+	int selectedTaskIndex = 0;
+	// array contains list of actions that defined on the task when dialog is show
+	public static final CharSequence[] TASKS_ACTIONS = new CharSequence[] {"Edit", "Delete", "Reschedule"};
+	Runnable[] tasksActions = new Runnable[]{
+			new Runnable() {
+				public void run() {
+					Toast.makeText(TasksListActivity.this, "" + selectedTaskIndex, Toast.LENGTH_LONG).show();
+				}
+			},
+			new Runnable() {
+				public void run() {
+					Toast.makeText(TasksListActivity.this, "" + selectedTaskIndex, Toast.LENGTH_LONG).show();
+				}
+			},
+			new Runnable() {
+				public void run() {
+					Toast.makeText(TasksListActivity.this, "" + selectedTaskIndex, Toast.LENGTH_LONG).show();
+				}
+			}
+	};
 }

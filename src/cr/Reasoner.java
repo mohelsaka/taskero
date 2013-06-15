@@ -8,6 +8,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 
+import sak.todo.database.Task;
+
 public class Reasoner {
 
 	long[][] stp;
@@ -171,6 +173,7 @@ public class Reasoner {
 		return -1;
 	}
 
+	/*
 	public static void main(String[] args) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader("tests.txt"));
 		String line = reader.readLine();
@@ -226,5 +229,5 @@ public class Reasoner {
 
 		writer.close();
 	}
-
+	*/
 }
