@@ -301,9 +301,15 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 				Task task = itr.nextTask();
 				while (task != null) {
 					Interval i = new Interval(task.duedate.getTime(), task.duedate.getTime());
-					Task.NULLTASK.addAfter(task, i);
-					addedTasks.add(task);
-					task = itr.nextTask();
+ 					Task.NULLTASK.addAfter(task, i);
+ 					addedTasks.add(task);
+					if (task.duedate.getTime() > System.currentTimeMillis()) {
+						Task.NULLTASK.addAfter(task, new Interval(task.duedate.getTime(),
+								task.duedate.getTime()));
+						addedTasks.add(task);
+					}
+
+ 					task = itr.nextTask();
 				}
 
 				Reasoner reasoner = Reasoner.instance();

@@ -115,10 +115,10 @@ public class Preference_Learner {
 				System.out.println(startHours);
 				day = task.getStartDate().getDay();
 				
-//				if(startHours==0)
-//					startHours=24;
-//				if(endHours==0)
-//					endHours=24;
+				if(startHours==0)
+					startHours=24;
+				if(endHours==0)
+					endHours=24;
 				
 				
 				index = NUM_OF_TIME_BLOCKS * day + ff.get(BLOCKS[startHours-1]);

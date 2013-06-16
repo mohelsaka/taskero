@@ -1,5 +1,6 @@
 package sak.todo.gui.schedules;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -16,6 +17,7 @@ import sak.todo.gui.R.color;
 import sak.todo.gui.R.id;
 import sak.todo.gui.R.layout;
 import sak.todo.gui.agenda.TasksListActivity;
+import taskero.learner.Preference_Learner;
 import android.app.ActionBar;
 import android.app.ActionBar.TabListener;
 import android.app.Activity;
@@ -234,13 +236,26 @@ public class SchedulesActivity extends Activity implements TabListener, OnItemCl
 		while (it.hasNext()) {
 			Task task = (Task) it.next();
 			
+			
 			// saving the task will save it due date too
 			// TODO: update only due date if performance degradation has encountered
 			task.save();
+			ArrayList<Task> temp = assignments.get(0);
+			ArrayList<Task> temp2 = assignments.get(currentScheduleIndex);
+			assignments.set(0, temp2);
+			assignments.set(currentScheduleIndex, temp);
+			Preference_Learner learner = Preference_Learner.getInstance(null,
+					null, 0);
+			try {
+				learner.learn(assignments);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		// end this activity and back to the main activity
-		Intent i = new Intent(null, TasksListActivity.class);
+		Intent i = new Intent(this, TasksListActivity.class);
 		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // setting this flag will cause intermediate activities to finish
 		startActivity(i);
 	}

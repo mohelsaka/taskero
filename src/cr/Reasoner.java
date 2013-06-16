@@ -1,10 +1,5 @@
 package cr;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -103,6 +98,7 @@ public class Reasoner {
 
 	boolean[] visited;
 
+	long fifteenMinutes = 900000;
 	ArrayList<ArrayList<Task>> assignTimes() throws CloneNotSupportedException {
 		visited = new boolean[tasks.size()];
 		ArrayList<ArrayList<Task>> assignments = new ArrayList<ArrayList<Task>>();
@@ -125,7 +121,9 @@ public class Reasoner {
 				System.out.println(add);
 				System.out.println(Math.abs(stp[j][current]));
 				System.out.println(new Date(now));
-				t.setDueDate(new Date(now + Math.abs(stp[j][current]) + add));
+				long date1 = (now + Math.abs(stp[j][current]) + add)/fifteenMinutes*fifteenMinutes;
+				long date2 = (now + Math.abs(stp[j][current]) + add)/fifteenMinutes*fifteenMinutes+fifteenMinutes;
+				t.setDueDate(new Date(date2+t.estimate*60*60*1000>t.deadline.getTime()?date1:date2));
 				assignment.add(t);
 				visited[j] = true;
 				current = j;

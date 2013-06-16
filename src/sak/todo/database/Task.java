@@ -535,6 +535,7 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 	public Task clone() throws CloneNotSupportedException {
 		Task t = new Task((Date)this.duedate.clone(), this.estimate, this.body, this.id);
 		t.priority = this.priority;
+		t.deadline = this.deadline;
 		return t;
 	}
 
@@ -555,7 +556,7 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 		if (duedate != null) {
 			dest.writeLong(duedate.getTime());
 			dest.writeLong(end.getTime());
-			dest.writeLong(duedate.getTime());
+			dest.writeLong(deadline.getTime());
 			dest.writeLong(id);
 			dest.writeFloat(estimate);
 			dest.writeString(body);	
@@ -569,7 +570,7 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 		// written to the parcel
 		duedate = new Date(in.readLong());
 		end = new Date(in.readLong());
-		duedate = new Date(in.readLong());
+		deadline = new Date(in.readLong());
 		id = in.readLong();
 		estimate = in.readFloat();
 		body = in.readString();
