@@ -8,8 +8,18 @@
     <uses-sdk
         android:minSdkVersion="14"
         android:targetSdkVersion="11" />
+    
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <permission android:name="sak.todo.gcm.permission.C2D_MESSAGE" 
+        android:protectionLevel="signature" />
+    <uses-permission android:name="sak.todo.gcm.permission.C2D_MESSAGE" />
 
     <application
+        android:allowBackup="false"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Light" >
@@ -17,10 +27,7 @@
        <activity
             android:name="sak.todo.gui.agenda.TasksListActivity"
             android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
         </activity>
 
        <activity
@@ -34,6 +41,25 @@
         
         <activity android:name="CreateMultiTaskActivity" >
         </activity>
+		
+        <!-- GCM receiver and test activity -->
+        <activity android:name="sak.todo.gcm.DemoActivity" 
+            android:label="@string/app_name">
+			<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
+        <receiver
+			android:name="sak.todo.gcm.GcmBroadcastReceiver"
+			android:permission="com.google.android.c2dm.permission.SEND" >
+            
+			<intent-filter>
+				<action android:name="com.google.android.c2dm.intent.RECEIVE" />
+				<category android:name="sak.todo.gui" />
+			</intent-filter>
+		</receiver>
+		
     </application>
 </manifest>
