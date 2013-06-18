@@ -48,7 +48,7 @@ public class UserState {
 	 * 	tasks: [{
 	 * 			priority: int,
 	 * 			duedate: long,
-	 * 			deadline: long
+	 * 			duration: long
 	 * 			}, ...],
 	 * model: [int, ...],
 	 * calendar: [int, ...]
