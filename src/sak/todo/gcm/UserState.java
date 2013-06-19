@@ -30,7 +30,7 @@ public class UserState {
 	
 	
 	/**
-	 * Vector contains all tasks that has due date greater thatn now.
+	 * Vector contains all tasks that has due date greater that now.
 	 * */
 	Vector<Task> tasks;
 	
