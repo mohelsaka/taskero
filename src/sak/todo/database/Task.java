@@ -18,6 +18,7 @@ import sak.todo.database.DBHelper;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
@@ -54,7 +55,7 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 		before = new ArrayList<Task>();
 		beforeIntervals = new ArrayList<Interval>();
 		deadline = new Date();
-		setDueDate(new Date(0));
+		setDueDate(0);
 	}
 	Task(String body, float estimate){
 		this();
@@ -67,9 +68,9 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 		NULLTASK.addAfter(this, new Interval(System.currentTimeMillis(), deadLine.getTime()-(long)estimate*60*60*1000));
 	}
 	
-	public void setDueDate(Date d){
-		duedate = d;
-		end = new Date((long) (d.getTime()+estimate*60*60*1000));
+	public void setDueDate(long d){
+		duedate = new Date(d);
+		end = new Date((long) (d+estimate*60*60*1000));
 	}
 	public void addBefore(Task task, Interval interval){
 		before.add(task);
@@ -534,6 +535,7 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 	public Task clone() throws CloneNotSupportedException {
 		Task t = new Task((Date)this.duedate.clone(), this.estimate, this.body, this.id);
 		t.priority = this.priority;
+		t.deadline = this.deadline;
 		return t;
 	}
 
@@ -554,7 +556,7 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 		if (duedate != null) {
 			dest.writeLong(duedate.getTime());
 			dest.writeLong(end.getTime());
-			dest.writeLong(duedate.getTime());
+			dest.writeLong(deadline.getTime());
 			dest.writeLong(id);
 			dest.writeFloat(estimate);
 			dest.writeString(body);	
@@ -568,7 +570,7 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 		// written to the parcel
 		duedate = new Date(in.readLong());
 		end = new Date(in.readLong());
-		duedate = new Date(in.readLong());
+		deadline = new Date(in.readLong());
 		id = in.readLong();
 		estimate = in.readFloat();
 		body = in.readString();
@@ -604,4 +606,6 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 				c.getDisplayName(Calendar.AM_PM, Calendar.SHORT, Locale.US)
 				);
 	}
+	
+	public static final int[] PRIORITY_COLORS = new int[]{Color.rgb(185, 255, 255), Color.rgb(205, 255, 255), Color.rgb(147, 100, 255)};
 }

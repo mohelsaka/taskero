@@ -55,8 +55,8 @@ public class Preference_Learner {
 	private static Preference_Learner learner = null;
 	public static Preference_Learner getInstance(ArrayList<ArrayList<Task>> calendar,
 			SVMAdapter svmAdapter, int numOfRuns){
-		if(learner != null)
-			return learner;
+//		if(learner != null)
+//			return learner;
 		learner = new Preference_Learner(calendar, svmAdapter, numOfRuns);
 			
 			return learner;
@@ -115,10 +115,10 @@ public class Preference_Learner {
 				System.out.println(startHours);
 				day = task.getStartDate().getDay();
 				
-//				if(startHours==0)
-//					startHours=24;
-//				if(endHours==0)
-//					endHours=24;
+				if(startHours==0)
+					startHours=24;
+				if(endHours==0)
+					endHours=24;
 				
 				
 				index = NUM_OF_TIME_BLOCKS * day + ff.get(BLOCKS[startHours-1]);

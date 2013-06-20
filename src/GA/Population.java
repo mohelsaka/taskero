@@ -15,7 +15,7 @@ public class Population {
 	static int MaxGenerations=5;
 	static long timeElapes;
 	static long maxTime=2000;
-	static double MinimumFitness;
+//	static double MinimumFitness;
 	static double minimumThreshold;
 	static Random r=new Random();
 	public Population() {
@@ -57,7 +57,7 @@ public class Population {
 		}
 		
 		result.fitness=fit;
-		MinimumFitness=Math.min(result.fitness, MinimumFitness);
+//		MinimumFitness=Math.min(result.fitness, MinimumFitness);
 		return result;
 	}
 	
@@ -77,7 +77,8 @@ public class Population {
 		result.tasksCost[index]=cost[index][assignment[index]];
 		result.fitness=inv.fitness-inv.tasksCost[index]+result.tasksCost[index];
 		if(result.fitness<M)result.feasible=true;
-		MinimumFitness=Math.min(MinimumFitness, result.fitness);
+//		MinimumFitness=Math.min(MinimumFitness, result.fitness);
+		Log.d("debug", "finish mutation");
 		return result;
 	}
 	public boolean StoppingCriteriaReached(){
@@ -89,7 +90,7 @@ public class Population {
 		// just now
 		if(Generation==MaxGenerations)return true;
 		if(timeElapes>=maxTime)return true;
-		if(MinimumFitness<=minimumThreshold) return true;
+//		if(MinimumFitness<=minimumThreshold) return true;
 		return false;
 	}
 }

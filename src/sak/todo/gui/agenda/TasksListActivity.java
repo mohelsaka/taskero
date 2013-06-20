@@ -45,6 +45,7 @@ public class TasksListActivity extends ListActivity implements TabListener{
 
 //		deleteAllTasks();
 //		createSomeTasks();
+//		createSomeTasks();
 //		updatePrioirties();
 		
 		Cursor cursor = Task.getAllTasksPointedAtToday();
@@ -167,4 +168,24 @@ public class TasksListActivity extends ListActivity implements TabListener{
 		// TODO Auto-generated method stub
 		
 	}
+	int selectedTaskIndex = 0;
+	// array contains list of actions that defined on the task when dialog is show
+	public static final CharSequence[] TASKS_ACTIONS = new CharSequence[] {"Edit", "Delete", "Reschedule"};
+	Runnable[] tasksActions = new Runnable[]{
+			new Runnable() {
+				public void run() {
+					Toast.makeText(TasksListActivity.this, "" + selectedTaskIndex, Toast.LENGTH_LONG).show();
+				}
+			},
+			new Runnable() {
+				public void run() {
+					Toast.makeText(TasksListActivity.this, "" + selectedTaskIndex, Toast.LENGTH_LONG).show();
+				}
+			},
+			new Runnable() {
+				public void run() {
+					Toast.makeText(TasksListActivity.this, "" + selectedTaskIndex, Toast.LENGTH_LONG).show();
+				}
+			}
+	};
 }

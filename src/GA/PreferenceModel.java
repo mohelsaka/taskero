@@ -18,6 +18,6 @@ public class PreferenceModel {
 		return PM.get(task_id);
 	}
 	public static int PreferencesNum(){
-		return numPref;
+		return numPref=10;
 	}
 }

@@ -16,11 +16,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_alignParentLeft="true"
-    android:layout_toLeftOf="@+id/ScrollViewListofAddedTasks"
-    android:layout_above="@+id/AddTask"
+    
     >
 
     <LinearLayout
+        android:id="@+id/LinearLayoutTaskcrud"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
@@ -43,12 +43,11 @@
             android:ems="10"
             android:gravity="top|left"
             android:inputType="textMultiLine"
-            android:lines="5"
+            android:lines="2"
             android:maxWidth="5.0dip"
             android:minWidth="10.0dip"
             android:scrollHorizontally="false" >
 
-            <requestFocus />
         </EditText>
 
         <TextView
@@ -59,60 +58,104 @@
             android:text="@string/priority"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <RatingBar
-            android:id="@+id/ratingBar1"
-            android:layout_width="244dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:numStars="5" />
-        
-        <HorizontalScrollView 
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-        <LinearLayout  
-            android:id="@+id/ConstraintLayoutBefore"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-                 
-            
-        <TextView
-            android:id="@+id/textView6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="35dp"
-            android:layout_marginLeft="15dp"
-            android:text="Before"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-        
-            
-       
-        
+        <LinearLayout 
+         android:id="@+id/ratingBar1"
+         android:layout_width="wrap_content"
+	     android:layout_height="wrap_content"
+	     android:gravity="center_horizontal">
+	     	<Button
+	            android:id="@+id/rate_low"
+	            android:layout_width="35dp"
+	            android:layout_height="35dp"
+	            android:background="@drawable/rate_low"
+	             />
+	     	<Button
+	            android:id="@+id/rate_medium"
+	            android:layout_width="35dp"
+	            android:layout_marginLeft="30dp"
+	            android:layout_height="35dp"
+	            android:background="@drawable/rate_medium"
+	             />
+	        <Button
+	            android:id="@+id/rate_high"
+	            android:layout_width="35dp"
+	            android:layout_height="35dp"
+	            android:layout_marginLeft="30dp"
+	            android:background="@drawable/rate_high"
+	             />
         </LinearLayout>
-        </HorizontalScrollView>
-        <HorizontalScrollView 
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-        <LinearLayout  
-            android:id="@+id/ConstraintLayoutAfter"
+        <TextView android:id="@+id/Rate_Statue"
             android:layout_width="wrap_content"
             android:layout_marginTop="10dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text=""/>
+        <ScrollView 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            >
+        <LinearLayout  
+            android:id="@+id/ConstraintLayoutBefore"
+            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical"
+        	android:scrollbars="vertical" 
             android:layout_height="wrap_content">
                  
             
-        <TextView
-            android:id="@+id/textView006"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/ButtonAddTaskBefore"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
             android:layout_height="wrap_content"
-            android:layout_marginRight="35dp"
-            android:layout_marginLeft="15dp"
-            android:text="After   "
+            android:layout_marginRight="25dp"
+            android:layout_marginLeft="25dp"
+            android:background="@drawable/shape"
+            android:textSize="15sp"
+            android:padding="7dp"
+            android:text="Add Task before .."
             android:textAppearance="?android:attr/textAppearanceSmall" />
         
             
        
         
         </LinearLayout>
-        </HorizontalScrollView>
+        </ScrollView>
+        <ScrollView 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            >
+        <LinearLayout  
+            android:id="@+id/ConstraintLayoutAfter"
+            android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical"
+        	android:scrollbars="vertical" 
+            android:layout_height="wrap_content">
+                 
+            
+        <Button
+            android:id="@+id/ButtonAddTaskAfter"
+            android:layout_width="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="25dp"
+            android:layout_marginLeft="25dp"
+            android:background="@drawable/shape"
+            android:textSize="15sp"
+            android:padding="7dp"
+            android:text="Add Task after  .."
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        
+            
+       
+        
+        </LinearLayout>
+        </ScrollView>
         <!--
         <LinearLayout
             android:layout_width="fill_parent"
@@ -209,45 +252,31 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
-                    android:ems="5"
+                    android:ems="7"
                     android:inputType="numberDecimal" />
 
                 
             </RelativeLayout>
         </LinearLayout>
 
-        
+        <LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="50dp" >
+	    
+	</LinearLayout>
     </LinearLayout>
 
-</ScrollView>
-
-<ScrollView android:id="@+id/ScrollViewListofAddedTasks"
-    android:layout_width="70dp"
-    android:layout_height="match_parent"
-    android:layout_above="@+id/AddTask"
-    android:layout_alignParentRight="true"
-    android:background="@drawable/gradient_bc"
-    >
-<LinearLayout
-    android:id="@+id/ListofAddedTasks"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:scrollbars="vertical" >
-    		
-           
-    
-</LinearLayout>
+	
 </ScrollView>
 		<Button
         android:id="@+id/AddTask"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/edit"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:textSize="30sp"
-        android:background="@drawable/gradient_bc"
-        android:text="  +  " />
+        android:background="@drawable/ic_menu_add"
+         />
 
 		<Button
 		    android:id="@+id/SaveAll"
@@ -255,9 +284,29 @@
 		    android:layout_height="wrap_content"
 		    android:layout_alignParentRight="true"
 		    android:layout_alignParentBottom="true"
-		    android:background="@drawable/gradient_bc"
-		    android:text="  Next  "
-		    android:textSize="30sp" />
+		    android:background="@drawable/next"
+		    android:layout_marginRight="10dp"
+		    android:layout_marginBottom="5dp"
+		    android:scaleY="1.5"
+		    android:scaleX="1.5" />
+
+		<ScrollView
+		    android:id="@+id/ScrollViewListofAddedTasks"
+		    android:layout_width="100dp"
+		    android:layout_height="match_parent"
+		    android:layout_toRightOf="@+id/ScrollViewParent"
+		    android:layout_marginLeft="-100dp"
+		    android:background="@drawable/gradient_bc" >
+
+		    <LinearLayout
+		        android:id="@+id/ListofAddedTasks"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:orientation="vertical"
+		        android:scrollbars="vertical" >
+        
+		    </LinearLayout>
+		</ScrollView>
 
 </RelativeLayout>
 

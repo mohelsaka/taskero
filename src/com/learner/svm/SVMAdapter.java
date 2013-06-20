@@ -1,4 +1,5 @@
 package com.learner.svm;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,10 +25,10 @@ public class SVMAdapter {
 
 	String data_dir;
 	
-	public String train_file = "train.dat";
-	public String model_file = "model";
-	public String test_file = "test.dat";
-	public String predictions_file = "predictions";
+	public static final String train_file = "train.dat";
+	public static final String model_file = "model.dat";
+	public static final String test_file = "test.dat";
+	public static final String predictions_file = "predictions";
 	private int numOfRuns;
 		
 	public void setNumOfRuns(int numOfRuns) {
@@ -42,27 +43,29 @@ public class SVMAdapter {
 
 	public void init() throws IOException {
 		// testing with a data file
-		FileOutputStream f = context.openFileOutput(train_file, Context.MODE_PRIVATE);
+		if(new File(model_file).exists())
+			return;
+		FileOutputStream f = context.openFileOutput(model_file, Context.MODE_PRIVATE);
 
-		String s = "# query 1\n"
-				+ "3 qid:1 1:0 2:1 3:0 4:0.2 5:0\n"
-				+ "2 qid:1 1:1 2:0 3:1 4:0.1 5:1\n"
-				+ "1 qid:1 1:3 2:1 3:0 4:0.4 5:0\n"
-				+ "1 qid:1 1:4 2:0 3:1 4:0.3 5:0\n"
-				+ "# query 2\n"
-				+ "1 qid:2 1:0 2:0 3:1 4:0.2 5:0\n"
-				+ "2 qid:2 1:1 2:0 3:1 4:0.4 5:0\n"
-				+ "1 qid:2 1:5 2:0 3:1 4:0.1 5:0\n"
-				+ "1 qid:2 1:8 2:0 3:1 4:0.2 5:0\n"
-				+ "# query 3\n"
-				+ "2 qid:3 1:0 2:0 3:1 4:0.1 5:1\n"
-				+ "3 qid:3 1:1 2:1 3:0 4:0.3 5:0\n"
-				+ "4 qid:3 1:1 2:0 3:0 4:0.4 5:1\n"
-				+ "1 qid:3 1:0 2:1 3:1 4:0.5 5:0\n";
+//		String s = "# query 1\n"
+//				+ "3 qid:1 1:0 2:1 3:0 4:0.2 5:0\n"
+//				+ "2 qid:1 1:1 2:0 3:1 4:0.1 5:1\n"
+//				+ "1 qid:1 1:3 2:1 3:0 4:0.4 5:0\n"
+//				+ "1 qid:1 1:4 2:0 3:1 4:0.3 5:0\n"
+//				+ "# query 2\n"
+//				+ "1 qid:2 1:0 2:0 3:1 4:0.2 5:0\n"
+//				+ "2 qid:2 1:1 2:0 3:1 4:0.4 5:0\n"
+//				+ "1 qid:2 1:5 2:0 3:1 4:0.1 5:0\n"
+//				+ "1 qid:2 1:8 2:0 3:1 4:0.2 5:0\n"
+//				+ "# query 3\n"
+//				+ "2 qid:3 1:0 2:0 3:1 4:0.1 5:1\n"
+//				+ "3 qid:3 1:1 2:1 3:0 4:0.3 5:0\n"
+//				+ "4 qid:3 1:1 2:0 3:0 4:0.4 5:1\n"
+//				+ "1 qid:3 1:0 2:1 3:1 4:0.5 5:0\n";
 
-		f.write(s.getBytes(), 0, s.length());
-		f.flush();
-		f.close();
+//		f.write(s.getBytes(), 0, s.length());
+//		f.flush();
+//		f.close();
 		
 		// writing for testing file
 //		f = context.openFileOutput(test_file, Context.MODE_WORLD_READABLE);
@@ -75,23 +78,22 @@ public class SVMAdapter {
 //		f.flush();
 //		f.close();
 
-//		f = context.openFileOutput(model_file, Context.MODE_WORLD_READABLE);
-//		s = "SVM-light Version V6.20\n"+
-//						"0 # kernel type\n"+
-//						"3 # kernel parameter -d \n"+
-//						"1 # kernel parameter -g \n"+
-//						"1 # kernel parameter -s \n"+
-//						"1 # kernel parameter -r \n"+
-//						"empty# kernel parameter -u \n"+
-//						"78 # highest feature index \n"+
-//						"7 # number of training documents \n"+
-//						"2 # number of support vectors plus 1 \n"+
-//						"0 # threshold b, each following line is a SV (starting with alpha*y)\n"+
-//						"1 1:-0.5011691777 2:-1.0033824507 3:2.020214461 4:5.032343138 5:0.619348547 6:0.5080857845 7:0.330916763 8:0.372772063 9:2.0020895251 12:2.016171569 13:2.0080857845 17:-1.0020024232 18:-4.0013349488 20:-1.0081842439 22:-0.2065146969 23:0.8 24:-0.3081842439 27:-3.0070150662 28:-4.02117171 29:5.003383785 32:-0.622489389 33:5.0013448098 34:4.0056223474 35:-8.0063938452 36:7.019555448 37:8.065991521 38:0.07822179 40:-0.9840048463 42:-9.015367749 44:8.050876547 45:7.0097777238 46:-8.0013349488 48:-8.0023383554 49:-9.0056223474 50:-8.01353514 51:7.033017363 56:-9.017814266 57:-8.010151355 58:-0.99101274 60:9.030525928 63:-0.9013349488 64:0.7740428923 65:-5.011244695 66:-5.016867042 68:-0.712128677 70:-0.615367749 73:0.719555448 75:-0.9911691777 76:-0.7723383554 77:-0.922746585 #";
-//		
-//		f.write(s.getBytes(), 0, s.length());
-//		f.flush();
-//		f.close();
+		String s = "SVM-light Version V6.20\n"+
+					"0 # kernel type\n"+
+					"3 # kernel parameter -d\n"+ 
+					"1 # kernel parameter -g\n"+ 
+					"1 # kernel parameter -s\n"+ 
+					"1 # kernel parameter -r\n"+ 
+					"empty# kernel parameter -u\n"+ 
+					"78 # highest feature index\n"+ 
+					"12 # number of training documents\n"+ 
+					"2 # number of support vectors plus 1\n"+ 
+					"0 # threshold b, each following line is a SV (starting with alpha*y)\n"+
+					"1 1:-0.036026154 3:-0.49825519 11:-0.49825519 15:-0.49825519 16:0.058761824 20:0.49825519 21:-0.41316158 22:-0.41316158 23:-0.41316158 49:0.93308568 51:-0.41316158 56:-0.35439977 58:0.10782927 60:0.78923023 62:-0.10782927 65:-0.74016279 67:-0.10782927 68:0.17628546 72:0.0096943667 75:-0.28771085 77:0.5375455 #";
+		
+		f.write(s.getBytes(), 0, s.length());
+		f.flush();
+		f.close();
 		
 //		runLearning();
 	}
@@ -100,6 +102,16 @@ public class SVMAdapter {
 	 * wrapper for native function rankLearn
 	 * */
 	public void runLearning() {
+		
+		try {
+//			Log.d("SVM", dumpFile(test_file));
+//			Log.d("SVM", dumpFile(predictions_file));
+			Log.d("SVM", dumpFile(train_file));
+			Log.d("SVM", dumpFile(model_file));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		rankLearn(data_dir + train_file, data_dir + model_file);
 	}
 	
@@ -107,6 +119,12 @@ public class SVMAdapter {
 	 * wrapper for native function rankClassify
 	 * */
 	public void runClassify(){
+		try {
+			Log.d("SVM", dumpFile(test_file));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		rankClassify(data_dir+test_file,
 				data_dir + model_file,
 				data_dir + predictions_file);
@@ -149,7 +167,7 @@ public class SVMAdapter {
 	 * */
 	
 	public void saveTestingTuples(CalenderFeatureVector[] ar,int numOFRuns) throws IOException{
-		FileOutputStream f = context.openFileOutput("test.dat", Activity.MODE_PRIVATE);
+		FileOutputStream f = context.openFileOutput(test_file, Activity.MODE_PRIVATE);
 		
 		StringBuilder str = new StringBuilder();
 		for(CalenderFeatureVector o : ar)
@@ -167,7 +185,12 @@ public class SVMAdapter {
 	 * TODO: objects will be later of type Calendar and it has to implement a convenient toString method
 	 * */
 	public void appendToTrainingTupples(ArrayList<ArrayList<Task>> calendar, CalenderFeatureVector[]cal,int numOfRuns) throws IOException{
-		FileOutputStream f = context.openFileOutput("train.dat", Activity.MODE_APPEND);
+		File ff = new File(train_file);
+		if(ff.delete())
+			System.out.println("train file deleted");
+		else
+			System.out.println("train file was not deleted");
+		FileOutputStream f = context.openFileOutput(train_file, Activity.MODE_APPEND);
 		
 		StringBuilder str = new StringBuilder();
 //		str.append("1 qid:1");
