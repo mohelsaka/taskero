@@ -8,6 +8,7 @@ import java.util.Vector;
 import sak.todo.database.DBHelper;
 import sak.todo.database.Task;
 import sak.todo.database.TasksIterator;
+import sak.todo.gcm.GCMUtilities;
 import sak.todo.gui.CreateMultiTaskActivity;
 import sak.todo.gui.R;
 import android.app.ActionBar;
@@ -39,13 +40,13 @@ public class TasksListActivity extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		// requesting action bar feature
 		getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
 		
 	    setContentView(R.layout.tasks_list);
-
-	    DBHelper.initialize(this);
+	    
+	    initilaizeHelpers();
 
 //		deleteAllTasks();
 //		createSomeTasks();
@@ -61,6 +62,12 @@ public class TasksListActivity extends ListActivity {
 		list.setSelection(position);
 		list.setOnItemLongClickListener(longClickListener);
 	}
+	
+	private void initilaizeHelpers(){
+		DBHelper.initialize(this);
+		GCMUtilities.initialize(this);
+	}
+	
 	
 	@Override
 	protected void onResume() {

@@ -46,7 +46,7 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
 		PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0,
-				new Intent(ctx, DemoActivity.class), 0);
+				new Intent(ctx, GCMUtilities.class), 0);
 
 		Notification.Builder mBuilder = new Notification.Builder(ctx)
 				.setContentTitle("GCM Notification").setContentText(msg);

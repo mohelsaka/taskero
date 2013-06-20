@@ -2,67 +2,56 @@ package sak.todo.gcm;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import sak.todo.gui.R;
-
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import android.app.Activity;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.util.Log;
-import android.widget.TextView;
 
 /**
  * Main UI for the demo app.
  */
-public class DemoActivity extends Activity {
+public class GCMUtilities {
 
     public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
-    private static final String PROPERTY_ON_SERVER_EXPIRATION_TIME =
-            "onServerExpirationTimeMs";
+    private static final String PROPERTY_ON_SERVER_EXPIRATION_TIME = "onServerExpirationTimeMs";
+
     /**
-     * Default lifespan (7 days) of a reservation until it is considered expired.
+     * Default lifespan (30 days) of a reservation until it is considered expired.
      */
-    public static final long REGISTRATION_EXPIRY_TIME_MS = 1000 * 3600 * 24 * 7;
+    public static final long REGISTRATION_EXPIRY_TIME_MS = 1000 * 3600 * 24 * 30;
 
     /**
      * Substitute you own sender ID here.
      */
-    String SENDER_ID = "806335698327";
+    private static final String SENDER_ID = "806335698327";
 
     /**
      * Tag used on log messages.
      */
     static final String TAG = "GCMDemo";
 
-    GoogleCloudMessaging gcm;
-    AtomicInteger msgId = new AtomicInteger();
-    SharedPreferences prefs;
-    Context context;
+    private static GoogleCloudMessaging gcm;
+    
+    private static Context context;
 
-    String regid;
+    private static String regid;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.main);
-
-        context = getApplicationContext();
+    public static void initialize(Context _context) {
+        context = _context;
         regid = getRegistrationId(context);
 
         if (regid.length() == 0) {
             registerBackground();
         }
-        gcm = GoogleCloudMessaging.getInstance(this);
+        gcm = GoogleCloudMessaging.getInstance(context);
     }
     
     /**
@@ -73,7 +62,7 @@ public class DemoActivity extends Activity {
      * @return registration id, or empty string if the registration is not
      *         complete.
      */
-    private String getRegistrationId(Context context) {
+    private static String getRegistrationId(Context context) {
         final SharedPreferences prefs = getGCMPreferences(context);
         String registrationId = prefs.getString(PROPERTY_REG_ID, "");
         if (registrationId.length() == 0) {
@@ -94,9 +83,8 @@ public class DemoActivity extends Activity {
     /**
      * @return Application's {@code SharedPreferences}.
      */
-    private SharedPreferences getGCMPreferences(Context context) {
-        return getSharedPreferences(DemoActivity.class.getSimpleName(), 
-                Context.MODE_PRIVATE);
+    private static SharedPreferences getGCMPreferences(Context context) {
+        return context.getSharedPreferences(GCMUtilities.class.getSimpleName(), Context.MODE_PRIVATE);
     }
     
     /**
@@ -122,7 +110,7 @@ public class DemoActivity extends Activity {
      *
      * @return true if the registration has expired.
      */
-    private boolean isRegistrationExpired() {
+    private static boolean isRegistrationExpired() {
         final SharedPreferences prefs = getGCMPreferences(context);
         // checks if the information is not stale
         long expirationTime =
@@ -136,39 +124,27 @@ public class DemoActivity extends Activity {
      * Stores the registration id, app versionCode, and expiration time in the 
      * application's shared preferences.
      */
-    private void registerBackground() {
-    	
-        new AsyncTask<Object, Object, Object>() {
-            @Override
-            protected String doInBackground(Object... params) {
-                String msg = "";
-                try {
+    private static void registerBackground() {
+    	AsyncTask.execute(new Runnable() {
+			
+			public void run() {
+				try {
                     if (gcm == null) {
                         gcm = GoogleCloudMessaging.getInstance(context);
                     }
                     regid = gcm.register(SENDER_ID);
-                    msg = "Device registered, registration id=" + regid;
-                    
                     Log.d("GCM", "Registration id is: " + regid);
-                    // You should send the registration ID to your server over HTTP,
-                    // so it can use GCM/HTTP or CCS to send messages to your app.
-
-                    // For this demo: we don't need to send it because the device
-                    // will send upstream messages to a server that echo back the message
-                    // using the 'from' address in the message.
-
-                    // Save the regid - no need to register again.
+                    
+                    // sending the registration id to our server
+                    ServerUtilities.register(GCMUtilities.getGmailAccount(), regid);
+                    
+                    // Save the registration id - no need to register again.
                     setRegistrationId(context, regid);
                 } catch (IOException ex) {
-                    msg = "Error :" + ex.getMessage();
+                	ex.printStackTrace();
                 }
-                return msg;
-            }
-            
-            protected void onPostExecute(Object msg) {
-            	Log.d("GCM", msg.toString());
-            };
-        }.execute(null, null, null);
+			}
+		});
     }
     
     /**
@@ -178,7 +154,7 @@ public class DemoActivity extends Activity {
      * @param context application's context.
      * @param regId registration id
      */
-    private void setRegistrationId(Context context, String regId) {
+    private static void setRegistrationId(Context context, String regId) {
         final SharedPreferences prefs = getGCMPreferences(context);
         int appVersion = getAppVersion(context);
         Log.v(TAG, "Saving regId on app version " + appVersion);
@@ -187,9 +163,15 @@ public class DemoActivity extends Activity {
         editor.putInt(PROPERTY_APP_VERSION, appVersion);
         long expirationTime = System.currentTimeMillis() + REGISTRATION_EXPIRY_TIME_MS;
 
-        Log.v(TAG, "Setting registration expiry time to " +
-                new Timestamp(expirationTime));
+        Log.v(TAG, "Setting registration expiry time to " + new Timestamp(expirationTime));
         editor.putLong(PROPERTY_ON_SERVER_EXPIRATION_TIME, expirationTime);
         editor.commit();
+    }
+    
+    private static String getGmailAccount(){
+    	AccountManager mgr = AccountManager.get(context);
+    	Account[] gAccounts = mgr.getAccountsByType("com.google");
+    	
+    	return gAccounts[0].name;
     }
 }
