@@ -172,6 +172,7 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 		
 		
 		
+		
 		bodyView = (EditText) this.findViewById(R.id.RelativeLayout1).findViewById(R.id.ScrollViewParent).findViewById(R.id.LinearLayoutTaskcrud).findViewById(R.id.taskBody);
 		priorityhigh = (Button) this.findViewById(R.id.ScrollViewParent).findViewById(R.id.rate_high);
 		prioritylow = (Button) this.findViewById(R.id.ScrollViewParent).findViewById(R.id.rate_low);

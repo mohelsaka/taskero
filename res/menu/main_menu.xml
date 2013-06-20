@@ -4,5 +4,10 @@
         android:title="@string/create_multitask_item"
         android:icon="@drawable/ic_menu_add" 
         android:showAsAction="always|withText"></item>
+    
+    <item android:id="@+id/create_meeting"
+        android:title="@string/create_meeting"
+        android:icon="@android:drawable/ic_menu_send" 
+        android:showAsAction="always|withText"></item>
 
 </menu>

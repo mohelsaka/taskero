@@ -20,7 +20,7 @@
         <item>Uranus</item>
         <item>Neptune</item>
     </string-array>
-
+	<string name="action_settings">action</string>
     <string name="select_date">Select date and time</string>
     <string name="impression">Impression</string>
     <string name="body">Body</string>
@@ -80,7 +80,7 @@
 	
     <!-- Title for menu items -->
     <string name="create_multitask_item">Add Tasks</string>
-    
+    <string name="create_meeting">Add meeting</string>
     <string name="schdule_1">schdule#1</string>
     <string name="schdule_2">schdule#2</string>
     <string name="schdule_3">schdule#3</string>
