@@ -14,6 +14,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.simple.JSONObject;
 
+import android.app.Activity;
+import android.app.Application;
+import android.content.Context;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
 
 public class ServerUtilities {
@@ -42,6 +46,8 @@ public class ServerUtilities {
         // Execute HTTP Post Request
         HttpResponse response = new DefaultHttpClient().execute(httppost);
         Log.d("SERVER", response.getStatusLine().getReasonPhrase());
+        
+        // TODO: get user id from the response and save it in shared preferences
 	}
 	
 	/**
@@ -78,11 +84,11 @@ public class ServerUtilities {
         Log.d("SERVER", response.getStatusLine().getReasonPhrase());
 	}
 	
-	public static void updateUserState(UserState userState, int userId, String userEmail) throws ClientProtocolException, IOException{
+	public static void updateUserState(Context context, int userId, String userEmail) throws ClientProtocolException, IOException, NameNotFoundException{
 		// building JSON object to be sent
 		JSONObject user = new JSONObject();
 		user.put("email", userEmail);
-		user.put("state", userState.toJSON());
+		user.put("state", UserState.getCurrentUserStateAsJSON(context));
 		
 		JSONObject data = new JSONObject();
 		data.put("user", user);

@@ -3,10 +3,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 import sak.todo.database.Task;
 
 import taskero.learner.CalenderFeatureVector;
+import taskero.learner.Preference_Learner;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -212,5 +214,26 @@ public class SVMAdapter {
 		byte[] buffer = new byte[1024 * 1024];
 		int count = f.read(buffer);
 		return new String(buffer, 0, count);
+	}
+	
+	/**
+	 * 
+	 * reads the model file and parses svm weights as an array of floats
+	 * @throws IOException 
+	 * 
+	 * */
+	public HashMap<Integer, Float> getSVMWeights() throws IOException{
+		String model = dumpFile(model_file);
+		HashMap<Integer, Float> weights = new HashMap<Integer, Float>();
+		
+		int indexOfLastLine = model.lastIndexOf('\n');
+		String lastLine = model.substring(indexOfLastLine + 3); // skipping some chars
+		String[] splits = lastLine.split(" ");
+		for (String weightPair : splits) {
+			String [] pair = weightPair.split(":");
+			weights.put(Integer.parseInt(pair[0]), Float.parseFloat(pair[1]));
+		}
+		
+		return weights;
 	}
 }

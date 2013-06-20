@@ -106,7 +106,7 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 
 	public Date duedate;
 	public Date deadline;
-	public float estimate; // estimate in minutes
+	public float estimate; // estimate in hours
 	public int impression; // 0...10
 	public int priority; // 0...10
 

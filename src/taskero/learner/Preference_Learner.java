@@ -36,7 +36,7 @@ public class Preference_Learner {
 	private Float[] predictions;
 	private SVMAdapter svmAdapter; 
 	
-	private final int NUM_OF_FEATURES = 77;
+	public static final int NUM_OF_FEATURES = 77;
 	private int numOfRuns;
 
 	public Preference_Learner(ArrayList<ArrayList<Task>> calendar,

@@ -1,12 +1,23 @@
 package sak.todo.gcm;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 import java.util.Vector;
 
+import org.json.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.learner.svm.SVMAdapter;
+
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager.NameNotFoundException;
 
 import sak.todo.database.Task;
+import sak.todo.database.TasksIterator;
 
 
 /**
@@ -48,14 +59,37 @@ public class UserState {
 	 * 	tasks: [{
 	 * 			priority: int,
 	 * 			duedate: long,
-	 * 			duration: long
+	 * 			duration: float
 	 * 			}, ...],
 	 * model: [int, ...],
-	 * calendar: [int, ...]
 	 * }
+	 * @throws NameNotFoundException 
+	 * @throws IOException 
 	 * 
 	 * */
-	public JSONObject toJSON(){
-		return null;
+	public static JSONObject getCurrentUserStateAsJSON(Context context) throws NameNotFoundException, IOException{
+		JSONObject state = new JSONObject();
+		
+		// get tasks info
+		TasksIterator it = Task.getScheduledTasks(new Date(), new Date(Long.MAX_VALUE));
+		JSONArray tasks = new JSONArray();
+		Task t = null;
+		while ((t = it.nextTask()) != null) {
+			JSONObject o = new JSONObject();
+			o.put("priority", t.priority);
+			o.put("duedate", t.duedate.getTime());
+			o.put("duration", t.estimate);
+			tasks.put(o);
+		}
+		state.put("tasks", tasks);
+		
+		// getting SVM model weights
+		SVMAdapter model = new SVMAdapter(context);
+		Collection<Float> weights = new ArrayList<Float>();
+		JSONArray arr = new JSONArray();
+		arr.put(model.getSVMWeights());
+		state.put("model", arr);
+		
+		return state;
 	}
 }
