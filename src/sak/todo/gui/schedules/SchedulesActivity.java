@@ -16,7 +16,9 @@ import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -30,6 +32,7 @@ import android.widget.Toast;
 
 import com.googlecode.android.widgets.DateSlider.DateSlider;
 import com.googlecode.android.widgets.DateSlider.DateTimeSlider;
+import com.learner.svm.SVMAdapter;
 
 public class SchedulesActivity extends Activity implements TabListener, OnItemClickListener{
 	ArrayList<ArrayList<Task>> assignments;
@@ -225,27 +228,41 @@ public class SchedulesActivity extends Activity implements TabListener, OnItemCl
 		Iterator<Task> it = schedule.iterator();
 		while (it.hasNext()) {
 			Task task = (Task) it.next();
-			
 			// saving the task will save it due date too
-			// TODO: update only due date if performance degradation has encountered
 			task.save();
-//			ArrayList<Task> temp = assignments.get(0);
-//			ArrayList<Task> temp2 = assignments.get(currentScheduleIndex);
-//			assignments.set(0, temp2);
-//			assignments.set(currentScheduleIndex, temp);
-//			Preference_Learner learner = Preference_Learner.getInstance(null,
-//					null, 0);
-//			try {
-//				learner.learn(assignments);
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
+		}
+		
+		//= start learning process to with current session information
+		// setting selected assignment on top of all assignments
+		ArrayList<Task> temp = assignments.get(0);
+		ArrayList<Task> temp2 = assignments.get(currentScheduleIndex);
+		assignments.set(0, temp2);
+		assignments.set(currentScheduleIndex, temp);
+		
+		try {
+			SVMAdapter svm = new SVMAdapter(this);
+			svm.init();
+			
+			Preference_Learner learner = Preference_Learner.getInstance(null, svm, incAndGetQueryID());
+			learner.learn(assignments);
+			
+			Toast.makeText(this, "Learning process DONE!", Toast.LENGTH_LONG).show();
+		} catch (Exception e) {
+			Toast.makeText(this, "Learning process Failed", Toast.LENGTH_LONG).show();
+			e.printStackTrace();
 		}
 		
 		// end this activity and back to the main activity
 		Intent i = new Intent(this, TasksListActivity.class);
 		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // setting this flag will cause intermediate activities to finish
 		startActivity(i);
+		finish();
+	}
+	
+	private int incAndGetQueryID(){
+		SharedPreferences pref = getSharedPreferences("LEARNER", Context.MODE_PRIVATE);
+		int queryID = pref.getInt("QUERY_ID", 0);
+		pref.edit().putInt("QUERY_ID", queryID + 1).commit();
+		return queryID + 1;
 	}
 }
