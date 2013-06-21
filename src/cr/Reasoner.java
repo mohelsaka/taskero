@@ -27,9 +27,6 @@ public class Reasoner {
 	public void setPresetTasks(ArrayList<Task> preset){
 		this.presetTasks = preset;
 	}
-	void addPresetTasks(ArrayList<Task> presetTasks){
-		this.presetTasks = presetTasks;
-	}
 
 	public ArrayList<ArrayList<Task>> schedule(ArrayList<Task> tasks)
 			throws STPNotConnsistentException {
