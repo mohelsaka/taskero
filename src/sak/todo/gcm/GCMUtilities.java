@@ -2,6 +2,9 @@ package sak.todo.gcm;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+
+import org.json.JSONException;
+
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import android.accounts.Account;
@@ -20,6 +23,7 @@ public class GCMUtilities {
 
     public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
+    public static final String PROPERTY_SERVER_REG_ID = "server_registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
     private static final String PROPERTY_ON_SERVER_EXPIRATION_TIME = "onServerExpirationTimeMs";
 
@@ -113,8 +117,7 @@ public class GCMUtilities {
     private static boolean isRegistrationExpired() {
         final SharedPreferences prefs = getGCMPreferences(context);
         // checks if the information is not stale
-        long expirationTime =
-                prefs.getLong(PROPERTY_ON_SERVER_EXPIRATION_TIME, -1);
+        long expirationTime = prefs.getLong(PROPERTY_ON_SERVER_EXPIRATION_TIME, -1);
         return System.currentTimeMillis() > expirationTime;
     }
     
@@ -136,13 +139,15 @@ public class GCMUtilities {
                     Log.d("GCM", "Registration id is: " + regid);
                     
                     // sending the registration id to our server
-                    ServerUtilities.register(GCMUtilities.getGmailAccount(), regid);
+                    String meetingServerRegID = ServerUtilities.register(GCMUtilities.getGmailAccount(), regid);
                     
                     // Save the registration id - no need to register again.
-                    setRegistrationId(context, regid);
+                    setRegistrationId(context, regid, meetingServerRegID);
                 } catch (IOException ex) {
                 	ex.printStackTrace();
-                }
+                } catch (JSONException e) {
+					e.printStackTrace();
+				}
 			}
 		});
     }
@@ -154,12 +159,17 @@ public class GCMUtilities {
      * @param context application's context.
      * @param regId registration id
      */
-    private static void setRegistrationId(Context context, String regId) {
+    private static void setRegistrationId(Context context, String regId, String serverRegID) {
         final SharedPreferences prefs = getGCMPreferences(context);
         int appVersion = getAppVersion(context);
         Log.v(TAG, "Saving regId on app version " + appVersion);
+        
         SharedPreferences.Editor editor = prefs.edit();
+        
+        // adding registration ids
         editor.putString(PROPERTY_REG_ID, regId);
+        editor.putString(PROPERTY_SERVER_REG_ID, serverRegID);
+        
         editor.putInt(PROPERTY_APP_VERSION, appVersion);
         long expirationTime = System.currentTimeMillis() + REGISTRATION_EXPIRY_TIME_MS;
 

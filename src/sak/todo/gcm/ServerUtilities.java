@@ -12,6 +12,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.simple.JSONObject;
 
 import android.app.Activity;
@@ -22,11 +23,14 @@ import android.util.Log;
 
 public class ServerUtilities {
 
-	private static final String TASKERO_SERVER_ADDRESS = "http://localhost:3000/";
+	private static final String TASKERO_SERVER_ADDRESS = "http://192.168.171.101:3000/";
 	private static final String USERS_ROUTE = "users.json";
 	private static final String MEETINGS_ROUTE = "meetings.json";
 	
-	public static void register(String email, String regid) throws ClientProtocolException, IOException{
+	/**
+	 * Registers the user on the server and sends back an id given by the server
+	 * */
+	public static String register(String email, String regid) throws ClientProtocolException, IOException, JSONException{
 		// building JSON object to be sent
 		JSONObject user = new JSONObject();
 		user.put("email", email);
@@ -46,8 +50,13 @@ public class ServerUtilities {
         // Execute HTTP Post Request
         HttpResponse response = new DefaultHttpClient().execute(httppost);
         Log.d("SERVER", response.getStatusLine().getReasonPhrase());
+        byte[] buffer = new byte[1024];
+        int byteCount = response.getEntity().getContent().read(buffer);
         
-        // TODO: get user id from the response and save it in shared preferences
+        org.json.JSONObject userJSON = new org.json.JSONObject(new String(buffer, 0, byteCount));
+        String id = userJSON.getString("id");
+        
+        return id;
 	}
 	
 	/**
