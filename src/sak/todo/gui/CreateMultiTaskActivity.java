@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
 
 import sak.todo.database.Task;
 import sak.todo.database.TasksIterator;
 import sak.todo.gui.schedules.SchedulesActivity;
 import taskero.learner.Preference_Learner;
+import GA.ScheduleTasks;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
@@ -19,6 +21,7 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -33,15 +36,12 @@ import android.view.View.OnDragListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationSet;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +49,7 @@ import com.googlecode.android.widgets.DateSlider.DateSlider;
 import com.googlecode.android.widgets.DateSlider.DateTimeSlider;
 import com.learner.svm.SVMAdapter;
 
+import cr.Constraint;
 import cr.Interval;
 import cr.Reasoner;
 import cr.STPNotConnsistentException;
@@ -58,15 +59,25 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 	LinearLayout listofAddedTasks;
 	LinearLayout listofConstraintBefore;
 	LinearLayout listofConstraintAfter;
+	LinkedList<View> checkConstraints;
 	ArrayList<Task> addedTasks;
+	ArrayList<PointConstraint> Constraints;
 	boolean listofAddedTaskAppears;
 	public static final String PREFS_NAME = "MyPrefsFile";
+	protected static final boolean GA_ENABLED = true;
 	// ArrayList<Constraint> constraints;
 	public SharedPreferences sharedPrefs;
 	private int screenWidth;
 	private int screenHeight;
 	static int priority;
-	
+	class PointConstraint{
+		Task t1;
+		Task t2;
+		public PointConstraint(Task t1,Task t2) {
+			this.t1=t1;
+			this.t2=t2;
+		}
+	}
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
@@ -109,7 +120,7 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 	private void animateBack() {
 		// TODO Auto-generated method stub
 		Log.d("debug", "here animate back");
-		TranslateAnimation anim=new TranslateAnimation(0,100,0,0);
+		TranslateAnimation anim=new TranslateAnimation(0,200,0,0);
 		
 		anim.setDuration(500);
 		AnimationSet logoAnimSet = new AnimationSet(true);
@@ -136,8 +147,8 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 		
 		findViewById(R.id.ScrollViewListofAddedTasks).startAnimation(logoAnimSet);
 		View v = findViewById(R.id.ScrollViewListofAddedTasks);
-		((RelativeLayout)findViewById(R.id.RelativeLayout1)).removeView(v);
-		((RelativeLayout)findViewById(R.id.RelativeLayout1)).addView(v);
+//		((RelativeLayout)findViewById(R.id.RelativeLayout1)).removeView(v);
+//		((RelativeLayout)findViewById(R.id.RelativeLayout1)).addView(v);
 		listofAddedTaskAppears = false;
 		
 	}
@@ -181,7 +192,8 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 		dueDateView = (Button) this.findViewById(R.id.ScrollViewParent).findViewById(R.id.duedate);
 
 		sharedPrefs = getSharedPreferences(PREFS_NAME, 0);
-
+		Constraints=new ArrayList<PointConstraint>();
+		checkConstraints=new LinkedList<View>();
 		if (!sharedPrefs.contains("numberOfRuns"))
 			sharedPrefs.edit().putInt("numberOfRuns", 0).commit();
 
@@ -276,7 +288,7 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 		activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 		    public void onGlobalLayout() {
 		        int heightDiff = activityRootView.getRootView().getHeight() - activityRootView.getHeight();
-		        if (heightDiff > 100) { // if more than 100 pixels, its probably a keyboard...
+		        if (heightDiff > 150) { // if more than 100 pixels, its probably a keyboard...
 		        	CreateMultiTaskActivity.this.findViewById(R.id.SaveAll).setVisibility(View.INVISIBLE);
 					CreateMultiTaskActivity.this.findViewById(R.id.AddTask).setVisibility(View.INVISIBLE);
 		        }
@@ -297,30 +309,118 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 			public void onClick(View v) {
 				Log.d("debug", "Save alll ........... ");
 
-				TasksIterator itr = Task.getScheduledTasks(new Date(System.currentTimeMillis()), new Date(Reasoner.INFINITY));
-				Task task = itr.nextTask();
-				while (task != null) {
-					Interval i = new Interval(task.duedate.getTime(), task.duedate.getTime());
- 					Task.NULLTASK.addAfter(task, i);
- 					addedTasks.add(task);
-					if (task.duedate.getTime() > System.currentTimeMillis()) {
-						Task.NULLTASK.addAfter(task, new Interval(task.duedate.getTime(),
-								task.duedate.getTime()));
-						addedTasks.add(task);
+				ArrayList<ArrayList<Task>> assignments = null;
+				// GA 
+				if(GA_ENABLED){
+					Task[] tasks=new Task[addedTasks.size()-1];
+					for (int i = 1; i < addedTasks.size(); i++) {
+						tasks[i-1]=addedTasks.get(i);
 					}
-
- 					task = itr.nextTask();
+					Point[] constraints=new Point[Constraints.size()];
+					for (int i = 0; i < Constraints.size(); i++) {
+						Task t1=Constraints.get(i).t1;
+						Task t2=Constraints.get(i).t2;
+						int index1=-1,index2=-1;
+						for (int j = 0; j < tasks.length; j++) {
+							if(t1.body.equals(tasks[j].body)){
+								index1=j;
+							}
+							if(t2.body.equals(tasks[j].body)){
+								index2=j;
+							}
+						}
+						constraints[i]=new Point(index1, index2);
+					}
+					ScheduleTasks s=new ScheduleTasks(tasks, constraints);
+					assignments=s.getAssignments();
+					ArrayList<ArrayList<Task>> deletedTasks=new ArrayList<ArrayList<Task>>();
+					for (int i = 0; i < assignments.size(); i++) {
+						
+						for (int j = i+1; j < assignments.size(); j++) {
+							ArrayList<Task >assign1=assignments.get(i);
+							ArrayList<Task >assign2=assignments.get(j);
+							
+							boolean deleted=true;
+							for (int k = 0; k < assign1.size(); k++) {
+								
+								
+								
+								long min=(long) ((double)((assign1.get(k).duedate.getTime()/15)+1)*15);
+								assign1.get(k).duedate.setTime(min);
+								
+								min=(long) ((double)((assign2.get(k).duedate.getTime()/15)+1)*15);
+								assign2.get(k).duedate.setTime(min);
+								
+								Log.d("debug", "assign1 "+assign1.get(k).duedate);
+								Log.d("debug", "assign2 "+assign2.get(k).duedate);
+								if(Math.abs(assign1.get(k).duedate.getTime()-assign2.get(k).duedate.getTime())>0.15*60*60){// half an hour
+									deleted=false;
+									break;
+								}
+							}
+							if(deleted){
+								Log.d("debug", "deleted");
+								deletedTasks.add(assign2);
+							}
+						}
+					}
+					for (int i = 0; i < deletedTasks.size(); i++) {
+						assignments.remove(deletedTasks.get(i));
+					}
+					
 				}
+				else{
+				// Sherif -> Reasoner
+					TasksIterator itr = Task.getScheduledTasks(new Date(System.currentTimeMillis()), new Date(Reasoner.INFINITY));
+					Task task = itr.nextTask();
+					ArrayList<Task> preset = new ArrayList<Task>();
+					while (task != null) {
+						preset.add(task);
+	 					task = itr.nextTask();
+					}
+					Reasoner reasoner = Reasoner.instance();
+					reasoner.setPresetTasks(preset);
+					
+						try {
+							assignments = reasoner.schedule(addedTasks);
+						} catch (STPNotConnsistentException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 
-				Reasoner reasoner = Reasoner.instance();
+						SVMAdapter svmAdapter;
+						try {
+							Log.d("assignments length", assignments.size() + "");
+							svmAdapter = new SVMAdapter(getApplicationContext());
 
-				ArrayList<ArrayList<Task>> assignments;
+							int numOfRuns = sharedPrefs.getInt("numberOfRuns", 0);
+							Preference_Learner pl = Preference_Learner.getInstance(assignments, svmAdapter, numOfRuns);
+							try {
+								svmAdapter.init();
+								assignments = pl.rank(pl.setcalenderFeatVector(assignments));
+
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+
+						} catch (NameNotFoundException e) {
+							e.printStackTrace();
+						}
+					
+
+				}
+				
+
+				if(GA_ENABLED){
+				
+				
+				
+				// amr-> Ranker
+				SVMAdapter svmAdapter;
 				try {
-					assignments = reasoner.schedule(addedTasks);
-
-					SVMAdapter svmAdapter;
-					try {
-						Log.d("assignments length", assignments.size() + "");
+					
+					if(assignments.size()>1){
+						Log.d("debug", assignments.size() + "");
 						svmAdapter = new SVMAdapter(getApplicationContext());
 
 						int numOfRuns = sharedPrefs.getInt("numberOfRuns", 0);
@@ -328,42 +428,41 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 						try {
 							svmAdapter.init();
 							assignments = pl.rank(pl.setcalenderFeatVector(assignments));
-
+							Log.d("debug", assignments.size() + "");
 						} catch (IOException e) {
+							Log.d("debug", "IOException "+e.getLocalizedMessage());
 							e.printStackTrace();
-						}
-
-					} catch (NameNotFoundException e) {
-						e.printStackTrace();
+					}
 					}
 
-					for (int i = 0; i < assignments.size(); i++) {
-						Log.d("debug", "assignment: " + i);
-						ArrayList<Task> assignment = assignments.get(i);
-						for (int j = 0; j < assignment.size(); j++) {
-							Task t = assignment.get(j);
-							Log.d("debug", "Task: " + t.getStartDate());
-						}
-						Log.d("debug", "-----------------------");
-					}
-					
-					Intent intent = new Intent(CreateMultiTaskActivity.this, SchedulesActivity.class);
-					intent.putExtra("assignments", assignments);
-
-					startActivity(intent);
-
-				} catch (STPNotConnsistentException e) {
-					Toast.makeText(getApplicationContext(),
-							"Constraints you entered are not consistent",
-							Toast.LENGTH_LONG).show();
+				} catch (NameNotFoundException e) {
+					Log.d("debug", "Name not found"+e.getLocalizedMessage());
+					e.printStackTrace();
 				}
+				Log.d("debug", "here");
+				}
+				// output
+				for (int i = 0; i < assignments.size(); i++) {
+					Log.d("debug", "assignment: " + i);
+					ArrayList<Task> assignment = assignments.get(i);
+					for (int j = 0; j < assignment.size(); j++) {
+						Task t = assignment.get(j);
+						Log.d("debug", "Task: " + t.getStartDate());
+					}
+					Log.d("debug", "-----------------------");
+				}
+				
+				Intent intent = new Intent(CreateMultiTaskActivity.this, SchedulesActivity.class);
+				intent.putExtra("assignments", assignments);
+
+				startActivity(intent);
 			}
 		});
 		findViewById(R.id.AddTask).setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
 
-				final TextView task = (TextView) LayoutInflater.from(
+				TextView task = (TextView) LayoutInflater.from(
 						CreateMultiTaskActivity.this).inflate(
 						R.drawable.task, null);
 
@@ -403,6 +502,9 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 							.show();
 					return;
 				}
+				
+				
+				checkConstraints.clear();
 				parentTask.estimate = Float.parseFloat(_estimate);
 				parentTask.body = body;
 				parentTask.priority = priority;
@@ -416,6 +518,9 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 				listofAddedTasks.addView(new TextView(
 						CreateMultiTaskActivity.this));
 				addedTasks.add(parentTask);
+				
+				
+				
 				parentTask = new Task();
 				bodyView.setText("");
 				priority=0;
@@ -440,11 +545,18 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 				
 				task.setOnClickListener(new OnClickListener() {
 					
-					public void onClick(View v) {
+					public void onClick(final View v) {
 						// TODO Auto-generated method stub
 
 						ClipData data = ClipData.newPlainText("", "");
 						Log.d("debug", "hereeee");
+						if(!checkConstraints.contains(v)){
+							checkConstraints.add(v);
+						}
+						else{
+							Toast.makeText(CreateMultiTaskActivity.this, "Error! Constraints violation ..", Toast.LENGTH_SHORT).show();
+							return;
+						}
 						DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
 								v);
 //						v.startDrag(data, shadowBuilder, v, 0);
@@ -452,32 +564,97 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 //						v.setBackgroundResource(R.drawable.shape_clicked);
 						animateBack();
 						View view = v;
-						TextView task = (TextView) LayoutInflater.from(
+						final LinearLayout layoutBefore= (LinearLayout) LayoutInflater.from(
 								CreateMultiTaskActivity.this).inflate(
-								R.drawable.task, null);
-						;
+								R.drawable.constraint, null);
+						final LinearLayout layoutAfter= (LinearLayout) LayoutInflater.from(
+								CreateMultiTaskActivity.this).inflate(
+								R.drawable.constraint, null);
 						
-						task=new TextView(CreateMultiTaskActivity.this);
 						
-						task.setText("Task: "+((TextView) view).getText());
+//						TextView task=new TextView(CreateMultiTaskActivity.this);
 						
-						task.setTextSize(20);
+						final TextView t = new TextView(CreateMultiTaskActivity.this);
+						t.setText("  ");
+						TextView task=null;
+						if(before){
+						layoutBefore.findViewById(R.id.delete).setOnClickListener(new OnClickListener() {
+							
+							public void onClick(View v1) {
+								// TODO Auto-generated method stub
+								checkConstraints.remove(v);
+								
+//									((LinearLayout)findViewById(R.id.ConstraintLayoutBefore)).removeView(layout);
+								((LinearLayout)findViewById(R.id.ConstraintLayoutBefore)).removeView(layoutBefore);
+								
+							}
+						});
+						task=((TextView)layoutBefore.findViewById(R.id.task));
+						task.setText(((TextView) view).getText());
+						
+						task.setTextSize(18);
 						task.setPadding(30, 0, 0, 0);
 						
-						TextView t = new TextView(CreateMultiTaskActivity.this);
-						t.setText("  ");
-						t.setTextSize(20);
+						layoutBefore.findViewById(R.id.delete).setPadding(50, 0, 0, 0);
+						layoutBefore.findViewById(R.id.delete).setBackgroundResource(R.drawable.cancel);
 
 						view.setVisibility(View.VISIBLE);
+						layoutBefore.findViewById(R.id.delete).setOnClickListener(new OnClickListener() {
+							
+							public void onClick(View v1) {
+								// TODO Auto-generated method stub
+								checkConstraints.remove(v);
+								
+								((LinearLayout)findViewById(R.id.ConstraintLayoutBefore)).removeView(t);
+								((LinearLayout)findViewById(R.id.ConstraintLayoutBefore)).removeView(layoutBefore);
+								
+							}
+						});
+						}
+						else{
+							layoutAfter.findViewById(R.id.delete).setOnClickListener(new OnClickListener() {
+								
+								public void onClick(View v1) {
+									// TODO Auto-generated method stub
+									checkConstraints.remove(v);
+									
+//										((LinearLayout)findViewById(R.id.ConstraintLayoutBefore)).removeView(layout);
+									((LinearLayout)findViewById(R.id.ConstraintLayoutAfter)).removeView(layoutAfter);
+									
+								}
+							});
+							task=((TextView)layoutAfter.findViewById(R.id.task));
+							task.setText(((TextView) view).getText());
+							
+							task.setTextSize(18);
+							layoutAfter.findViewById(R.id.textview).setPadding(30, 0, 0, 0);
+							
+							task.setPadding(0, 0, 30, 0);
+							layoutAfter.findViewById(R.id.delete).setBackgroundResource(R.drawable.cancel);
 
+							view.setVisibility(View.VISIBLE);
+							layoutAfter.findViewById(R.id.delete).setOnClickListener(new OnClickListener() {
+								
+								public void onClick(View v1) {
+									// TODO Auto-generated method stub
+									checkConstraints.remove(v);
+									
+									((LinearLayout)findViewById(R.id.ConstraintLayoutAfter)).removeView(t);
+									((LinearLayout)findViewById(R.id.ConstraintLayoutAfter)).removeView(layoutAfter);
+									
+								}
+							});
+						}
+
+						
 						if(before){
 							((LinearLayout)findViewById(R.id.ConstraintLayoutBefore)).addView(t);
-							((LinearLayout)findViewById(R.id.ConstraintLayoutBefore)).addView(task);
+							((LinearLayout)findViewById(R.id.ConstraintLayoutBefore)).addView(layoutBefore);
 							
 						}
 						else{
 							((LinearLayout)findViewById(R.id.ConstraintLayoutAfter)).addView(t);
-							((LinearLayout)findViewById(R.id.ConstraintLayoutAfter)).addView(task);
+							((LinearLayout)findViewById(R.id.ConstraintLayoutAfter)).addView(layoutAfter);
 							
 						}
 						// constraint creation:
@@ -492,10 +669,11 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 						}
 
 						if (before) {
+							Constraints.add(new PointConstraint(t1, parentTask));
 							parentTask.addAfter(t1, new Interval(0, Reasoner.INFINITY));
 						} else {
-							parentTask
-									.addBefore(t1, new Interval(0, Reasoner.INFINITY));
+							Constraints.add(new PointConstraint(parentTask, t1));
+							parentTask.addBefore(t1, new Interval(0, Reasoner.INFINITY));
 						}
 						
 

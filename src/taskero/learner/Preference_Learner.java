@@ -55,8 +55,8 @@ public class Preference_Learner {
 	private static Preference_Learner learner = null;
 	public static Preference_Learner getInstance(ArrayList<ArrayList<Task>> calendar,
 			SVMAdapter svmAdapter, int numOfRuns){
-		if(learner != null)
-			return learner;
+//		if(learner != null)
+//			return learner;
 		learner = new Preference_Learner(calendar, svmAdapter, numOfRuns);
 			
 			return learner;

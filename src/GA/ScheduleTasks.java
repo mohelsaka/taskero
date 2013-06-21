@@ -7,9 +7,11 @@ import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+
 import sak.todo.database.DBHelper;
 import sak.todo.database.Task;
 import sak.todo.database.TasksIterator;
+import android.graphics.Point;
 import android.util.Log;
 
 public class ScheduleTasks {
@@ -17,14 +19,13 @@ public class ScheduleTasks {
 	/*
 	 * input from user.. Focus rate of 24-hours of the day ..
 	 */
-	static int[] FocusRate=new int[]{8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,2,2,2,2,2};
+	static int[] FocusRate=new int[]{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2};
 	static Random random=new Random();
 	/**
 	 * Constructor for scheduling tasks.
 	 */
-	public ScheduleTasks(Task[] tasks) {
+	public ScheduleTasks(Task[] tasks,Point[] constraints) {
 		// TODO Auto-generated constructor stub
-		
 		Population pop=new Population();
 		pop.Generation=1; 
 		
@@ -35,20 +36,23 @@ public class ScheduleTasks {
 		float maxDuration = -1;
 		Date maxdeadline=getTimeNow();
 		for (int j = 0; j < tasks.length; j++) {
-			maxDuration = Math.max(tasks[j].estimate, maxDuration);
+			maxDuration = Math.max(tasks[j].estimate*60, maxDuration);
 			
 			if(maxdeadline.before(tasks[j].deadline)){
 				maxdeadline=tasks[j].deadline;
 			}
 		}
-		
 		TimeSlot[] timeSlots = getFreeTimeSlots(maxDuration,maxdeadline);
+		for (int i = 0; i < tasks.length; i++) {
+			Log.d("debug", "Task "+tasks[i].toString());
+		}
 		
 		for (int i = 0; i < PreferenceModel.PreferencesNum(); i++) {
+			Log.d("debug", "pref: "+i);
 			Individual individual=new Individual(tasks);
 			
 			
-			HandleUnscheduledTasks h=new HandleUnscheduledTasks(tasks,timeSlots,i);
+			HandleUnscheduledTasks h=new HandleUnscheduledTasks(tasks,timeSlots,i,constraints);
 			
 			
 			for (int j = 0; j < tasks.length; j++) {
@@ -57,22 +61,32 @@ public class ScheduleTasks {
 			}
 			individual.fitness=h.Cost;
 			individual.feasible=h.successfully;
-			if(!individual.feasible)return;// infeasible root ==> Game over!	
+			if(!individual.feasible)continue;// infeasible root ==> Game over!	
 			pop.individuals.add(individual);
+			
+			for (int j = 0; j < h.timeSlotsTaken.size(); j++) {
+				int ts=h.timeSlotsTaken.get(j);
+				Log.d("debug", "indexback : "+ts);
+				timeSlots[ts].setDuration(-1);
+				
+			}
+			h.timeSlotsTaken.clear();
 		}
 		Log.d("debug", pop.individuals.size()+"");
 		
 		// GA implementation
+		if(pop.individuals.size()==0)return ; // game over
 		do{
 			
 			Collections.sort(pop.individuals);
 			int len=pop.individuals.size();
+			if(len<2)break;
 			
 			// Select pair to mate from best ranked individuals for Crossover
 			Individual inv1=pop.individuals.get(len-1);
 			Individual inv2=pop.individuals.get(len-2);
 			Individual indCross=pop.Crossover(inv1, inv2);
-			
+
 			
 			// Mutation on random individual.
 			int index=random.nextInt(len);
@@ -88,7 +102,33 @@ public class ScheduleTasks {
 			
 		}while(!pop.StoppingCriteriaReached());
 		
+		
+		
+		
+		
+		// updated part.
+		// TODO 
+		
+
 		ArrayList<Individual> individuals= pop.individuals;
+		
+		Collections.sort(individuals);
+		
+		
+		for (int j = 0; j < Math.min(10, individuals.size()); j++) {
+			if(!individuals.get(j).feasible)continue;
+			ArrayList<Task> tks=new ArrayList<Task>();
+			Task[] nowTasks=individuals.get(j).tasks;
+			for (int k = 0; k < nowTasks.length; k++) {
+				tks.add(nowTasks[k]);
+			}
+			Log.d("debug", "assign: ");
+			assignments.add(tks);
+		}
+		
+		// end updated
+		
+		
 		double MinCost=Integer.MAX_VALUE;
 		int index=-1;
 		for (int i = 0; i < individuals.size(); i++) {
@@ -97,21 +137,29 @@ public class ScheduleTasks {
 				index=i;
 			}
 		}
-		Log.d("debug", "size: "+individuals.size());
-		Log.d("debug", "min finess: "+MinCost);
-		for (int i = 0; i < tasks.length; i++) {
-			Task.updateSinglField(tasks[i].id, DBHelper.COLUMN_DUE_DATE_NUM, individuals.get(index).tasks[i].duedate.getTime()+"");
-			Log.d("debug", "best: "+tasks[i].id+": "+individuals.get(index).tasks[i].duedate);
-		}
+		
+		// return ArrayList<ArrayList<Task>> assignments;
+
+//		Log.d("debug", "size: "+individuals.size());
+//		Log.d("debug", "min finess: "+MinCost);
+//		for (int i = 0; i < tasks.length; i++) {
+//			Task.updateSinglField(tasks[i].id, DBHelper.COLUMN_DUE_DATE_NUM, individuals.get(index).tasks[i].duedate.getTime()+"");
+//			Log.d("debug", "best: "+tasks[i].id+": "+individuals.get(index).tasks[i].duedate);
+//		}
 		
 		
 		
 		
 	}
+	
+	ArrayList<ArrayList<Task>> assignments=new ArrayList<ArrayList<Task>>();
+
 	public static TimeSlot[] getFreeTimeSlots(float maxDuration, Date maxDeadline) {
 		// TODO Auto-generated method stub
 		ArrayList<TimeSlot> list=new ArrayList<TimeSlot>();
 		Calendar c=Calendar.getInstance();
+		
+		
 		
 		TasksIterator ti =Task.getScheduledTasks(getTimeNow(), maxDeadline);
 		int count = ti.getCursor().getCount();
@@ -133,11 +181,11 @@ public class ScheduleTasks {
 			
 			for (int i = 0; i < tasks.length-1; i++) {
 				c.setTime(tasks[i].duedate);
-				c.add(Calendar.MINUTE, (int) tasks[i].estimate);
+				c.add(Calendar.MINUTE, (int) tasks[i].estimate*60);
 				list.add(addTimeSlot(c.getTime(), tasks[i+1].duedate));
 			}
 			c.setTime(tasks[tasks.length-1].duedate);
-			c.add(Calendar.MINUTE, (int) tasks[tasks.length-1].estimate);
+			c.add(Calendar.MINUTE, (int) tasks[tasks.length-1].estimate*60);
 			list.add(addTimeSlot(c.getTime(), maxDeadline));	
 		}
 		
@@ -204,6 +252,11 @@ public class ScheduleTasks {
 		long duration=TimeUnit.MILLISECONDS.toMinutes(d2.getTime()-d1.getTime());
 		
 		return new TimeSlot(d1, d2, duration, 0);
+	}
+
+	public ArrayList<ArrayList<Task>> getAssignments() {
+		// TODO Auto-generated method stub
+		return assignments;
 	}
 
 	
