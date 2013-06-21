@@ -1,8 +1,9 @@
 package GA;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 
 import sak.todo.database.Task;
+import android.graphics.Point;
 
 public class Individual implements Comparable<Individual>{
 	

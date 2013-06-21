@@ -1,15 +1,18 @@
 package cr;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
 import sak.todo.database.Task;
+
 
 public class Reasoner {
 
 	long[][] stp;
 	public static long INFINITY = Long.MAX_VALUE;
 	ArrayList<Task> tasks;
+	ArrayList<Task> presetTasks;
 
 	private Reasoner() {
 	}
@@ -21,6 +24,9 @@ public class Reasoner {
 			instance = new Reasoner();
 		return instance;
 	}
+	public void setPresetTasks(ArrayList<Task> preset){
+		this.presetTasks = preset;
+	}
 
 	public ArrayList<ArrayList<Task>> schedule(ArrayList<Task> tasks)
 			throws STPNotConnsistentException {
@@ -31,17 +37,21 @@ public class Reasoner {
 			for (int j = 0; j < n; j++)
 				if (i == j)
 					stp[i][j] = 0;
-//				else if (stp[i][j] == 0)
-//					stp[i][j] = INFINITY;
+				else if (stp[i][j] == 0)
+					stp[i][j] = INFINITY;
 		for (int i = 0; i < tasks.size(); i++) {
 			Task task = tasks.get(i);
 			for (int k = 0; k < task.before.size(); k++) {
 				int j = find(tasks, task.before.get(k));
+				if(j < 0)
+					continue;
 				stp[j][i] = task.beforeIntervals.get(k).max;
 				stp[i][j] = -task.beforeIntervals.get(k).min;
 			}
 			for (int k = 0; k < task.after.size(); k++) {
 				int j = find(tasks, task.after.get(k));
+				if(j < 0)
+					continue;
 				stp[i][j] = task.afterIntervals.get(k).max;
 				stp[j][i] = -task.afterIntervals.get(k).min;
 			}
@@ -98,6 +108,18 @@ public class Reasoner {
 
 	boolean[] visited;
 
+	boolean isAvailable(long date, long duration){
+		for (Task task : presetTasks) {
+			if((date >= task.duedate.getTime() && date <= task.duedate.getTime()+task.estimate*60*60*1000) || (task.duedate.getTime() >= date && task.duedate.getTime() <= date+duration) )
+				return false;
+		}
+		return true;
+	}
+	void appendPreset(ArrayList<Task> tasks){
+		for (Task task : presetTasks) {
+			tasks.add(task);
+		}
+	}
 	long fifteenMinutes = 900000;
 	ArrayList<ArrayList<Task>> assignTimes() throws CloneNotSupportedException {
 		visited = new boolean[tasks.size()];
@@ -110,20 +132,27 @@ public class Reasoner {
 			for (int k = 1; k < tasks.size(); k++)
 				visited[k] = false;
 			ArrayList<Task> assignment = new ArrayList<Task>();
+			appendPreset(assignment);
 			int current = 0;
 			Task prev = null;
 			long now = 0;
 			for (int i = 1; i < stp.length; i++) {
 				int j = findMinDeadLine(current, mul);
-//				System.out.println(j);
 				Task t = tasks.get(j).clone();
-				long add = mul * (stp[current][j] - Math.abs(stp[j][current])) / count;
-				System.out.println(add);
-				System.out.println(Math.abs(stp[j][current]));
-				System.out.println(new Date(now));
-				long date1 = (now + Math.abs(stp[j][current]) + add)/fifteenMinutes*fifteenMinutes;
-				long date2 = (now + Math.abs(stp[j][current]) + add)/fifteenMinutes*fifteenMinutes+fifteenMinutes;
-				t.setDueDate(new Date(date2+t.estimate*60*60*1000>t.deadline.getTime()?date1:date2));
+				while(true){
+					long add = mul*fifteenMinutes;
+					long date1 = (now+(Math.abs(stp[j][current]) + add))/fifteenMinutes*fifteenMinutes;
+					long date2 = (now+(Math.abs(stp[j][current]) + add))/fifteenMinutes*fifteenMinutes+fifteenMinutes;
+					if(isAvailable(date2, (long)t.estimate*60*60*1000) && date2+t.estimate*60*60*1000<t.deadline.getTime()){
+						t.setDueDate(date2);
+						break;
+					}
+					else if(isAvailable(date1, (long)t.estimate*60*60*1000)  && date1+t.estimate*60*60*1000<t.deadline.getTime()){
+						t.setDueDate(date1);
+						break;
+					}else
+						mul++;
+				}
 				assignment.add(t);
 				visited[j] = true;
 				current = j;
@@ -171,61 +200,90 @@ public class Reasoner {
 		return -1;
 	}
 
-	/*
-	public static void main(String[] args) throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader("tests.txt"));
-		String line = reader.readLine();
-		ArrayList<Task> tasks = new ArrayList<Task>();
-		PrintWriter writer = new PrintWriter(new File("result.txt"));
-		int z = 0;
-		while (line != null) {
-			tasks.clear();
-			 Task.NULLTASK = new Task(null, 0);
-			 tasks.add(Task.NULLTASK);
-			String[] taskInfo = line.split(",");
-			for (String string : taskInfo) {
-				System.out.println(string);
-				String[] splits = string.split(":");
-				String[] dateInfo = splits[2].split("/");
-				tasks.add(new Task("task " + splits[0], Float
-						.parseFloat(splits[1]), new Date(Integer
-						.parseInt(dateInfo[2]) - 1900, Integer
-						.parseInt(dateInfo[1]), Integer.parseInt(dateInfo[0]),
-						Integer.parseInt(dateInfo[3]), Integer
-								.parseInt(dateInfo[4]), Integer
-								.parseInt(dateInfo[5]))));
-			}
-			line = reader.readLine();
-			while (!line.equals("****")) {
-				System.out.println(line);
-				String[] constraints = line.split("-");
-				tasks.get(Integer.parseInt(constraints[0])).addAfter(
-						tasks.get(Integer.parseInt(constraints[1])),
-						new Interval(60 * 60000*(Long.parseLong(constraints[2])),
-								constraints[3].equals("inf") ? INFINITY : 60 * 60000*(Long
-										.parseLong(constraints[3]))));
-				line = reader.readLine();
-			}
-			line = reader.readLine();
-			try {
-				Reasoner r = Reasoner.instance();
-				ArrayList<ArrayList<Task>> assignments = r.schedule(tasks);
-				writer.write("test case "+z++);
-				for (ArrayList<Task> arrayList : assignments) {
-					writer.write("other assignment\n");
-					System.out.println("other assignment");
-					for (Task task : arrayList) {
-						System.out.println(task);
-						writer.write(task.toString()+"\n");
-					}
-				}
-			} catch (STPNotConnsistentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		writer.close();
+	public static void main(String[] args) throws IOException, STPNotConnsistentException {
+//		BufferedReader reader = new BufferedReader(new FileReader("tests.txt"));
+//		String line = reader.readLine();
+//		ArrayList<Task> tasks = new ArrayList<Task>();
+//		PrintWriter writer = new PrintWriter(new File("result.txt"));
+//		int z = 0;
+//		while (line != null) {
+//			tasks.clear();
+//			 Task.NULLTASK = new Task(null, 0);
+//			 tasks.add(Task.NULLTASK);
+//			String[] taskInfo = line.split(",");
+//			for (String string : taskInfo) {
+//				System.out.println(string);
+//				String[] splits = string.split(":");
+//				String[] dateInfo = splits[2].split("/");
+//				tasks.add(new Task("task " + splits[0], Float
+//						.parseFloat(splits[1]), new Date(Integer
+//						.parseInt(dateInfo[2]) - 1900, Integer
+//						.parseInt(dateInfo[1]), Integer.parseInt(dateInfo[0]),
+//						Integer.parseInt(dateInfo[3]), Integer
+//								.parseInt(dateInfo[4]), Integer
+//								.parseInt(dateInfo[5]))));
+//			}
+//			line = reader.readLine();
+//			while (!line.equals("****")) {
+//				System.out.println(line);
+//				String[] constraints = line.split("-");
+//				tasks.get(Integer.parseInt(constraints[0])).addAfter(
+//						tasks.get(Integer.parseInt(constraints[1])),
+//						new Interval(60 * 60000*(Long.parseLong(constraints[2])),
+//								constraints[3].equals("inf") ? INFINITY : 60 * 60000*(Long
+//										.parseLong(constraints[3]))));
+//				line = reader.readLine();
+//			}
+//			line = reader.readLine();
+//			try {
+//				Reasoner r = Reasoner.instance();
+//				ArrayList<ArrayList<Task>> assignments = r.schedule(tasks);
+//				writer.write("test case "+z++);
+//				for (ArrayList<Task> arrayList : assignments) {
+//					writer.write("other assignment\n");
+//					System.out.println("other assignment");
+//					for (Task task : arrayList) {
+//						System.out.println(task);
+//						writer.write(task.toString()+"\n");
+//					}
+//				}
+//			} catch (STPNotConnsistentException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//
+//		writer.close();
+		
+//		Task t1 = new Task();
+//		t1.estimate = 1;
+//		Task t2 = new Task();
+//		t2.estimate = 1;
+//		Task t3 = new Task();
+//		t3.estimate = 1;
+//		t1.setDueDate(new Date(113,6,20,0,0,0));
+//		t2.setDueDate(new Date(113,6,21,0,0,0));
+//		t3.setDueDate(new Date(113,6,20,2,0,0));
+//		ArrayList<Task> preset = new ArrayList<Task>();
+//		preset.add(t1);
+//		preset.add(t2);
+//		preset.add(t3);
+//		ArrayList<Task> tasks = new ArrayList<Task>();
+//		Task t4 = new Task("t4", 1,new Date(113,6,21,0,0,0));
+//		Task t5 = new Task("t5", 1,new Date(113,6,21,0,0,0));
+//		t5.addAfter(t4, new Interval(0, Reasoner.INFINITY));
+//		tasks.add(Task.NULLTASK);
+//		tasks.add(t4);
+//		tasks.add(t5);
+//		Reasoner.instance().addPresetTasks(preset);
+//		ArrayList<ArrayList<Task>> ass = Reasoner.instance().schedule(tasks);
+//		for (ArrayList<Task> arrayList : ass) {
+//			System.out.println("other assignment");
+//			for (Task task : arrayList) {
+//				System.out.println(task);
+//			}
+//		}
+//		
 	}
-	*/
 }
+

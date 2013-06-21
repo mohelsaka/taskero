@@ -1,4 +1,5 @@
 package com.learner.svm;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class SVMAdapter {
 	String data_dir;
 	
 	public static final String train_file = "train.dat";
-	public static final String model_file = "model";
+	public static final String model_file = "model.dat";
 	public static final String test_file = "test.dat";
 	public static final String predictions_file = "predictions";
 	private int numOfRuns;
@@ -44,6 +45,8 @@ public class SVMAdapter {
 
 	public void init() throws IOException {
 		// testing with a data file
+		if(new File(model_file).exists())
+			return;
 		FileOutputStream f = context.openFileOutput(model_file, Context.MODE_PRIVATE);
 
 //		String s = "# query 1\n"
@@ -184,6 +187,11 @@ public class SVMAdapter {
 	 * TODO: objects will be later of type Calendar and it has to implement a convenient toString method
 	 * */
 	public void appendToTrainingTupples(ArrayList<ArrayList<Task>> calendar, CalenderFeatureVector[]cal,int numOfRuns) throws IOException{
+		File ff = new File(train_file);
+		if(ff.delete())
+			System.out.println("train file deleted");
+		else
+			System.out.println("train file was not deleted");
 		FileOutputStream f = context.openFileOutput(train_file, Activity.MODE_APPEND);
 		
 		StringBuilder str = new StringBuilder();

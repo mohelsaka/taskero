@@ -55,7 +55,7 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 		before = new ArrayList<Task>();
 		beforeIntervals = new ArrayList<Interval>();
 		deadline = new Date();
-		setDueDate(new Date(0));
+		setDueDate(0);
 	}
 	Task(String body, float estimate){
 		this();
@@ -68,9 +68,9 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 		NULLTASK.addAfter(this, new Interval(System.currentTimeMillis(), deadLine.getTime()-(long)estimate*60*60*1000));
 	}
 	
-	public void setDueDate(Date d){
-		duedate = d;
-		end = new Date((long) (d.getTime()+estimate*60*60*1000));
+	public void setDueDate(long d){
+		duedate = new Date(d);
+		end = new Date((long) (d+estimate*60*60*1000));
 	}
 	public void addBefore(Task task, Interval interval){
 		before.add(task);
