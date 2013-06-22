@@ -174,7 +174,7 @@ public class Meeting {
 	public float estimate;
 	
 	
-	private long remote_id = 0;
+	public long remote_id = 0;
 	
 	// saved to differentiate between declined and undeclined meetings;
 	public int status = PENDING;

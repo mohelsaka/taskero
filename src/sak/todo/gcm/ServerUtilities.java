@@ -17,6 +17,8 @@ import org.json.simple.JSONObject;
 
 import sak.todo.database.Meeting;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
@@ -63,8 +65,11 @@ public class ServerUtilities {
 	
 	/**
 	 * sends meeting request to the server
+	 * 
+	 * @return	String	meeting id at the server 
+	 * @throws JSONException 
 	 * */
-	public static void requestMeeting(Meeting minfo) throws ClientProtocolException, IOException{
+	public static String requestMeeting(Meeting minfo, String userGmail) throws ClientProtocolException, IOException, JSONException{
 		// building JSON object to be sent
 		JSONObject meeting = new JSONObject();
 		meeting.put("body", minfo.body);
@@ -72,6 +77,10 @@ public class ServerUtilities {
 		
 		String [] collaborators = minfo.collaborators.split(",");
 		Vector<String> collVec = new Vector<String>();
+		
+		// the creator of the meeting is on top of the collaborators list
+		collVec.add(userGmail);
+		// add other collaborators
 		for (String user : collaborators)
 			collVec.add(user);
 		
@@ -90,6 +99,14 @@ public class ServerUtilities {
 		// Execute HTTP Post Request
 		HttpResponse response = new DefaultHttpClient().execute(httppost);
         Log.d("SERVER", response.getStatusLine().getReasonPhrase());
+        
+        byte[] buffer = new byte[1024];
+        int byteCount = response.getEntity().getContent().read(buffer);
+        
+        org.json.JSONObject meetingResponseJSON = new org.json.JSONObject(new String(buffer, 0, byteCount));
+        String meetingID = meetingResponseJSON.getString("id");
+        
+        return meetingID;
 	}
 	
 	public static void updateUserState(Context context, int userId, String userEmail) throws ClientProtocolException, IOException, NameNotFoundException{
@@ -112,4 +129,5 @@ public class ServerUtilities {
         HttpResponse response = new DefaultHttpClient().execute(httpput);
         Log.d("SERVER", response.getStatusLine().getReasonPhrase());
 	}
+	
 }

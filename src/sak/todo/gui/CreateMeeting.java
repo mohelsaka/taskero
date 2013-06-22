@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.apache.http.client.ClientProtocolException;
+import org.json.JSONException;
 
 import sak.todo.database.Meeting;
 import sak.todo.gcm.GCMUtilities;
@@ -17,6 +18,8 @@ import com.googlecode.android.widgets.DateSlider.DateTimeSlider;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.Notification;
@@ -93,7 +96,7 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 			
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				Toast.makeText(getApplicationContext(), "A Meeting has been sent", Toast.LENGTH_LONG);
+				Toast.makeText(getApplicationContext(), "A Meeting has been sent", Toast.LENGTH_LONG).show();
 				
 				Meeting meeting = new Meeting();
 				meeting.body = taskBody.getText().toString();
@@ -105,8 +108,24 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 				meeting.collaborators = meeting.collaborators.substring(0, meeting.collaborators.length()-2);
 				meeting.status = Meeting.PENDING;
 				meeting.estimate = Float.parseFloat(duration.getText().toString());
-				meeting.save();
-				sendNotification("here");
+				
+				// sending meeting request to the server
+				AccountManager mgr = AccountManager.get(CreateMeeting.this);
+			    Account[] gAccounts = mgr.getAccountsByType("com.google");
+				try {
+					String id = ServerUtilities.requestMeeting(meeting, gAccounts[0].name);
+					meeting.remote_id = Long.parseLong(id);
+					meeting.save();
+				} catch (ClientProtocolException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				
+
+//				sendNotification("here");
 			}
 		});
 		
