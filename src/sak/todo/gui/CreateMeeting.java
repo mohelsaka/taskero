@@ -103,6 +103,7 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 				{
 					meeting.collaborators +=selectedEmails.get(i)+","; 
 				}
+				meeting.collaborators = meeting.collaborators.substring(0, meeting.collaborators.length()-2);
 				meeting.status = Meeting.PENDING;
 				meeting.estimate = Float.parseFloat(duration.getText().toString());
 				meeting.save();

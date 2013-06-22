@@ -15,6 +15,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.simple.JSONObject;
 
+import sak.todo.database.Meeting;
+
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
@@ -60,23 +62,20 @@ public class ServerUtilities {
 	}
 	
 	/**
-	 * Temp Meeting class, used until the final version of meeting class be ready. 
-	 * */
-	static class Meeting{
-		String body;
-		long deadLine;
-		Vector<String> collaborators;
-	}
-	
-	/**
 	 * sends meeting request to the server
 	 * */
 	public static void requestMeeting(Meeting minfo) throws ClientProtocolException, IOException{
 		// building JSON object to be sent
 		JSONObject meeting = new JSONObject();
 		meeting.put("body", minfo.body);
-		meeting.put("deadline", minfo.deadLine);
-		meeting.put("collaborators", new JSONArray(minfo.collaborators));
+		meeting.put("deadline", minfo.duedate); // this is virtual holder for deadline
+		
+		String [] collaborators = minfo.collaborators.split(",");
+		Vector<String> collVec = new Vector<String>();
+		for (String user : collaborators)
+			collVec.add(user);
+		
+		meeting.put("collaborators", new JSONArray(collVec));
 		
 		JSONObject data = new JSONObject();
 		data.put("meeting", meeting);
