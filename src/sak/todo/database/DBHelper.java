@@ -68,15 +68,15 @@ public class DBHelper extends SQLiteOpenHelper {
 		sql = "CREATE INDEX task_log_idx ON task_log(task_id, att_num);";
 		db.execSQL(sql);
 		
-		// create meating table
+		// create meeting table
 		sql = "create table meetings (" + 
 				"_id integer PRIMARY KEY AUTOINCREMENT," + 
 				"body text, " +
-				"creator text, "+
 				"status INTEGER, "+
-				"updated_at INTEGER," +
 				"estimate REAL,"+
+				"duedate INTEGER"+
 				"remote_id INTEGER"+
+				"collaborators text"+
 				");";
 		db.execSQL(sql);
 		

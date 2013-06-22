@@ -1,5 +1,8 @@
 package sak.todo.gcm;
 
+import sak.todo.gui.MeetingDescision;
+import sak.todo.gui.R;
+
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import android.app.Activity;
@@ -20,6 +23,10 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 	private NotificationManager mNotificationManager;
 	Context ctx;
 
+	
+	// we need the to know the type of message so that we can send the 
+	// right notification
+	
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
@@ -42,17 +49,24 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 
 	// Put the GCM message into a notification and post it.
 	private void sendNotification(String msg) {
-		mNotificationManager = (NotificationManager) ctx
-				.getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager = (NotificationManager)ctx.getSystemService(Context.NOTIFICATION_SERVICE);
 
 		PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0,
-				new Intent(ctx, GCMUtilities.class), 0);
+				new Intent(ctx, MeetingDescision.class),0);
 
-		Notification.Builder mBuilder = new Notification.Builder(ctx)
-				.setContentTitle("GCM Notification").setContentText(msg);
+		
+		
+		Notification mBuilder = new Notification.Builder(ctx)
+				.setContentTitle("New mail from " + "test@gmail.com")
+				.setContentText(msg)
+				.setTicker("New mail from " + "test@gmail.com")
+				.setSmallIcon(R.drawable.icon)
+				.setContentIntent(contentIntent)
+				.build();
 
-		mBuilder.setContentIntent(contentIntent);
+//		mBuilder.setContentIntent(contentIntent);
 		mNotificationManager
-				.notify(NOTIFICATION_ID, mBuilder.getNotification());
+				.notify(NOTIFICATION_ID, mBuilder);
+
 	}
 }

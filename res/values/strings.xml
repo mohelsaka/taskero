@@ -72,6 +72,8 @@
     -->
     <string name="login_activity_newaccount_text">Sign in to your Sample SyncAdapter account. </string>
     
+    <string name="meeting_descision">You have been invited to a meeting with the following people:</string>
+    
         <!-- Title string for Login activity -->
     <string name="ui_activity_title">Sign-in</string>
     <string name="email">email</string>

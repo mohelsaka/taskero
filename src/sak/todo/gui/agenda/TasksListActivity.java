@@ -9,6 +9,7 @@ import sak.todo.database.DBHelper;
 import sak.todo.database.Task;
 import sak.todo.database.TasksIterator;
 import sak.todo.gcm.GCMUtilities;
+import sak.todo.gui.CreateMeeting;
 import sak.todo.gui.CreateMultiTaskActivity;
 import sak.todo.gui.R;
 import android.app.ActionBar;
@@ -91,6 +92,10 @@ public class TasksListActivity extends ListActivity implements TabListener{
 	        case R.id.creat_multitask_item:
 	        	Intent i = new Intent(this, CreateMultiTaskActivity.class);
 	        	startActivity(i);
+	            return true;
+	        case R.id.create_meeting:
+	        	Intent j = new Intent(this, CreateMeeting.class);
+	        	startActivity(j);
 	            return true;
 	        default:
 	            return super.onOptionsItemSelected(item);

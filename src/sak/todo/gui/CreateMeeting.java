@@ -1,17 +1,29 @@
 package sak.todo.gui;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import org.apache.http.client.ClientProtocolException;
+
+import sak.todo.database.Meeting;
+import sak.todo.gcm.GCMUtilities;
+import sak.todo.gcm.ServerUtilities;
 import sak.todo.gui.R;
 
 import com.googlecode.android.widgets.DateSlider.DateSlider;
 import com.googlecode.android.widgets.DateSlider.DateTimeSlider;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
@@ -21,10 +33,13 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.RemoteViews;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class CreateMeeting extends Activity implements 
 
@@ -34,12 +49,20 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 	private PopupMenu popupMenu; 
     private ArrayAdapter arrayAdapter;
 	private Button dateText;
+	private Button saveAll;
 	private ImageButton addPart;
+	private EditText taskBody;
+	private EditText duration;
+	
     private final static int ONE = 1;
     private final static int TWO = 2;
     private final static int THREE = 3;
     private ArrayList<String> emails;
-    private Button saveAll;
+    public static final int NOTIFICATION_ID = 0;
+    private long deadline;
+	private NotificationManager mNotificationManager;
+	
+    
     
     private ArrayList<String> selectedEmails = new ArrayList<String>();
 
@@ -55,6 +78,7 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 		String[] monthsArray = { };
 				 
 				    // Declare the UI components
+		taskBody = (EditText) findViewById(R.id.task_body);
 		monthsListView = (ListView) findViewById(R.id.months_list);
 		arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, selectedEmails);
 		monthsListView.setAdapter(arrayAdapter);
@@ -62,11 +86,27 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 		popupMenu = new PopupMenu(this, findViewById(R.id.participants));
 		popupMenu.setOnMenuItemClickListener(this);
 		saveAll = (Button) findViewById(R.id.SaveAll);
+		duration = (EditText) findViewById(R.id.editText1);
+		
 		
 		saveAll.setOnClickListener(new OnClickListener() {
 			
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
+				Toast.makeText(getApplicationContext(), "A Meeting has been sent", Toast.LENGTH_LONG);
+				
+				
+				Meeting meeting = new Meeting();
+				meeting.body = taskBody.getText().toString();
+				
+				for(int i=0;i<selectedEmails.size();i++)
+				{
+					meeting.collaborators +=selectedEmails.get(i)+","; 
+				}
+				meeting.status = Meeting.PENDING;
+				meeting.estimate = Float.parseFloat(duration.getText().toString());
+				meeting.save();
+				sendNotification("here");
 				
 			}
 		});
@@ -109,7 +149,7 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 	
 	private final DateSlider.OnDateSetListener mDateTimeSetListener = new DateSlider.OnDateSetListener() {
 		public void onDateSet(DateSlider view, Calendar selectedDate) {
-			// update the dateText view with the corresponding date
+			// update the dateText view with the corresponding dateetTime
 			final int minute = (selectedDate.get(Calendar.MINUTE) / DateTimeSlider.MINUTEINTERVAL)
 					* DateTimeSlider.MINUTEINTERVAL;
 			dateText.setText(String.format("%te. %tB %tY  %tH:%02d",
@@ -117,6 +157,7 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 
 			selectedDate.set(Calendar.MINUTE, minute);
 			selectedDate.set(Calendar.SECOND, 0);
+			deadline = selectedDate.getTime().getTime();
 			// updating task object's dates
 //			if (dateText.getId() == R.id.deadline)
 //				task.deadline = selectedDate.getTime();
@@ -192,6 +233,32 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private void sendNotification(String msg) {
+		
+//		Context t = new CreateMultiTaskActivity();
+		mNotificationManager = (NotificationManager) 
+				getSystemService(Context.NOTIFICATION_SERVICE);
+
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+				new Intent(this, MeetingDescision.class),0);
+
+		
+		
+		Notification mBuilder = new Notification.Builder(this)
+				.setContentTitle("New mail from " + "test@gmail.com")
+				.setContentText(msg)
+				.setTicker("New mail from " + "test@gmail.com")
+				.setSmallIcon(R.drawable.icon)
+				.setContentIntent(contentIntent)
+				.build();
+
+//		mBuilder.setContentIntent(contentIntent);
+		mNotificationManager
+				.notify(NOTIFICATION_ID, mBuilder);
+		
+//		mNotificationManager.notify(0, mBuilder);
 	}
 
 }
