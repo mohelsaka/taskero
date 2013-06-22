@@ -62,7 +62,7 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 				.setTicker("New mail from " + "test@gmail.com")
 				.setSmallIcon(R.drawable.icon)
 				.setContentIntent(contentIntent)
-				.build();
+				.getNotification();
 
 //		mBuilder.setContentIntent(contentIntent);
 		mNotificationManager

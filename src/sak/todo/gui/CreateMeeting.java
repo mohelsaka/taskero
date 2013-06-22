@@ -78,7 +78,7 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 		String[] monthsArray = { };
 				 
 				    // Declare the UI components
-		taskBody = (EditText) findViewById(R.id.task_body);
+		taskBody = (EditText) findViewById(R.id.taskBody);
 		monthsListView = (ListView) findViewById(R.id.months_list);
 		arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, selectedEmails);
 		monthsListView.setAdapter(arrayAdapter);
@@ -95,7 +95,6 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 				// TODO Auto-generated method stub
 				Toast.makeText(getApplicationContext(), "A Meeting has been sent", Toast.LENGTH_LONG);
 				
-				
 				Meeting meeting = new Meeting();
 				meeting.body = taskBody.getText().toString();
 				
@@ -108,7 +107,6 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 				meeting.estimate = Float.parseFloat(duration.getText().toString());
 				meeting.save();
 				sendNotification("here");
-				
 			}
 		});
 		
@@ -253,7 +251,7 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 				.setTicker("New mail from " + "test@gmail.com")
 				.setSmallIcon(R.drawable.icon)
 				.setContentIntent(contentIntent)
-				.build();
+				.getNotification();
 
 //		mBuilder.setContentIntent(contentIntent);
 		mNotificationManager
