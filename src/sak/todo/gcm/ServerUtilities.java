@@ -74,6 +74,7 @@ public class ServerUtilities {
 		JSONObject meeting = new JSONObject();
 		meeting.put("body", minfo.body);
 		meeting.put("deadline", minfo.duedate); // this is virtual holder for deadline
+		meeting.put("duration", minfo.estimate);
 		
 		String [] collaborators = minfo.collaborators.split(",");
 		Vector<String> collVec = new Vector<String>();

@@ -74,8 +74,8 @@ public class DBHelper extends SQLiteOpenHelper {
 				"body text, " +
 				"status INTEGER, "+
 				"estimate REAL,"+
-				"duedate INTEGER"+
-				"remote_id INTEGER"+
+				"duedate INTEGER,"+
+				"remote_id INTEGER,"+
 				"collaborators text"+
 				");";
 		db.execSQL(sql);

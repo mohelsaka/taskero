@@ -181,7 +181,7 @@ public class Meeting {
 	public static final int PENDING = 0;
 	public static final int  CONFIRMED= 1;
 	
-	public String  collaborators;
+	public String  collaborators = "";
 	
 	// due dates and their rating
 	// decomposing {duedate, rate, stared}

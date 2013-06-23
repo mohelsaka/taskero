@@ -16,6 +16,7 @@ import com.googlecode.android.widgets.DateSlider.DateSlider;
 import com.googlecode.android.widgets.DateSlider.DateTimeSlider;
 
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.accounts.Account;
@@ -25,6 +26,7 @@ import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -95,36 +97,55 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 		saveAll.setOnClickListener(new OnClickListener() {
 			
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				Toast.makeText(getApplicationContext(), "A Meeting has been sent", Toast.LENGTH_LONG).show();
-				
-				Meeting meeting = new Meeting();
+				final Meeting meeting = new Meeting();
 				meeting.body = taskBody.getText().toString();
 				
-				for(int i=0;i<selectedEmails.size();i++)
-				{
-					meeting.collaborators +=selectedEmails.get(i)+","; 
+				for(int i=0; i<selectedEmails.size(); i++) {
+					String email = selectedEmails.get(i);
+					meeting.collaborators += email+","; 
 				}
-				meeting.collaborators = meeting.collaborators.substring(0, meeting.collaborators.length()-2);
+
+				meeting.collaborators = meeting.collaborators.substring(0, meeting.collaborators.length()-1);
 				meeting.status = Meeting.PENDING;
 				meeting.estimate = Float.parseFloat(duration.getText().toString());
+				meeting.duedate = deadline;
 				
-				// sending meeting request to the server
+				//= sending meeting request to the server
+				// getting gmail account
 				AccountManager mgr = AccountManager.get(CreateMeeting.this);
 			    Account[] gAccounts = mgr.getAccountsByType("com.google");
-				try {
-					String id = ServerUtilities.requestMeeting(meeting, gAccounts[0].name);
-					meeting.remote_id = Long.parseLong(id);
-					meeting.save();
-				} catch (ClientProtocolException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				
+			    final String email =  gAccounts[0].name;
+			    
+			    // displaying in progress dialog
+			    final ProgressDialog mDialog = new ProgressDialog(CreateMeeting.this);
+			    mDialog.setMessage("requesting ...");
+			    mDialog.setCancelable(false);
+			    mDialog.show();
 
+			    final Toast failureToast = Toast.makeText(CreateMeeting.this, "Unable to send request", Toast.LENGTH_LONG);
+			    final Toast successToast = Toast.makeText(CreateMeeting.this, "Meeing request has been sent!", Toast.LENGTH_LONG);
+				
+			    AsyncTask.execute(new Runnable() {
+					public void run() {
+						boolean success = false;
+						try {
+							String id = ServerUtilities.requestMeeting(meeting, email);
+							meeting.remote_id = Long.parseLong(id);
+							meeting.save();
+							success = true;
+						} catch (Exception e) {
+							e.printStackTrace();
+						}finally{
+							mDialog.dismiss();
+							if (!success) {
+								failureToast.show();
+							}else{
+								successToast.show();
+								CreateMeeting.this.finish();
+							}
+						}
+					}
+				});
 //				sendNotification("here");
 			}
 		});
@@ -239,12 +260,12 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 
 	public boolean onMenuItemClick(MenuItem item) {
 		
-		selectedEmails.add(emails.get(item.getItemId()-1));
+		String email = emails.get(item.getItemId()-1);
+		selectedEmails.add(email);
 //		arrayAdapter.clear();
 //		arrayAdapter.add(emails.get(item.getItemId()));
 		arrayAdapter.notifyDataSetChanged();
-		
-		
+
 		return false;
 	}
 
