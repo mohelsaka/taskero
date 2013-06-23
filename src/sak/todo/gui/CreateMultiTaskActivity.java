@@ -64,7 +64,7 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 	ArrayList<PointConstraint> Constraints;
 	boolean listofAddedTaskAppears;
 	public static final String PREFS_NAME = "MyPrefsFile";
-	protected static final boolean GA_ENABLED = true;
+	protected static final boolean GA_ENABLED = false;
 	// ArrayList<Constraint> constraints;
 	public SharedPreferences sharedPrefs;
 	private int screenWidth;

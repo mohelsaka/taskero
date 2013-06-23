@@ -44,10 +44,6 @@ public class SVMAdapter {
 	}
 
 	public void init() throws IOException {
-		// testing with a data file
-		if(new File(model_file).exists())
-			return;
-		FileOutputStream f = context.openFileOutput(model_file, Context.MODE_PRIVATE);
 
 //		String s = "# query 1\n"
 //				+ "3 qid:1 1:0 2:1 3:0 4:0.2 5:0\n"
@@ -79,6 +75,13 @@ public class SVMAdapter {
 //		f.write(s.getBytes(), 0, s.length());
 //		f.flush();
 //		f.close();
+		
+		// check if the model file exists or not before trying to create new one.
+		if (context.getFileStreamPath(model_file).exists()) {
+			return;
+		}
+		
+		FileOutputStream f = context.openFileOutput(model_file, Context.MODE_PRIVATE);
 
 		String s = "SVM-light Version V6.20\n"+
 					"0 # kernel type\n"+
@@ -96,8 +99,6 @@ public class SVMAdapter {
 		f.write(s.getBytes(), 0, s.length());
 		f.flush();
 		f.close();
-		
-//		runLearning();
 	}
 	
 	/**
@@ -187,15 +188,9 @@ public class SVMAdapter {
 	 * TODO: objects will be later of type Calendar and it has to implement a convenient toString method
 	 * */
 	public void appendToTrainingTupples(ArrayList<ArrayList<Task>> calendar, CalenderFeatureVector[]cal,int numOfRuns) throws IOException{
-		File ff = new File(train_file);
-		if(ff.delete())
-			System.out.println("train file deleted");
-		else
-			System.out.println("train file was not deleted");
 		FileOutputStream f = context.openFileOutput(train_file, Activity.MODE_APPEND);
 		
 		StringBuilder str = new StringBuilder();
-//		str.append("1 qid:1");
 		for(int i=0;i<calendar.size();i++)
 		{
 			if(i==0)
@@ -204,7 +199,7 @@ public class SVMAdapter {
 				str.append("0 qid:"+numOfRuns+cal[i].toString() + '\n');
 		}
 		
-		f.write(str.toString().getBytes(), 0, str.length() - 1);
+		f.write(str.toString().getBytes(), 0, str.length());
 		f.flush();
 		f.close();
 	}

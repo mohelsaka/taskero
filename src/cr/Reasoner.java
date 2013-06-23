@@ -64,12 +64,15 @@ public class Reasoner {
 		System.out.println("Now solve stp");
 
 		stp = solveSTP();
+		try {
 		if (stp == null) {
 			throw new STPNotConnsistentException();
 		}
-		try {
 			return assignTimes();
-		} catch (CloneNotSupportedException e) {
+		} catch (STPNotConnsistentException s){
+			throw new STPNotConnsistentException();
+		}
+		catch (CloneNotSupportedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -121,7 +124,7 @@ public class Reasoner {
 		}
 	}
 	long fifteenMinutes = 900000;
-	ArrayList<ArrayList<Task>> assignTimes() throws CloneNotSupportedException {
+	ArrayList<ArrayList<Task>> assignTimes() throws CloneNotSupportedException, STPNotConnsistentException {
 		visited = new boolean[tasks.size()];
 		ArrayList<ArrayList<Task>> assignments = new ArrayList<ArrayList<Task>>();
 		int count = 8;
@@ -139,7 +142,9 @@ public class Reasoner {
 			for (int i = 1; i < stp.length; i++) {
 				int j = findMinDeadLine(current, mul);
 				Task t = tasks.get(j).clone();
+				boolean b = false;
 				while(true){
+					b = true;
 					long add = mul*fifteenMinutes;
 					long date1 = (now+(Math.abs(stp[j][current]) + add))/fifteenMinutes*fifteenMinutes;
 					long date2 = (now+(Math.abs(stp[j][current]) + add))/fifteenMinutes*fifteenMinutes+fifteenMinutes;
@@ -150,9 +155,18 @@ public class Reasoner {
 					else if(isAvailable(date1, (long)t.estimate*60*60*1000)  && date1+t.estimate*60*60*1000<t.deadline.getTime()){
 						t.setDueDate(date1);
 						break;
-					}else
+					}else if(date1+t.estimate*60*60*1000 > t.deadline.getTime() && assignments.size() > 0){
+						t.setDueDate(assignments.get(assignments.size()-1).get(j).duedate.getTime());
+						break;
+					}else if(date1+t.estimate*60*60*1000 > t.deadline.getTime() && assignments.size() == 0){
+						b = false;
 						mul++;
+						break;
+					}
+					mul++;
 				}
+				if(!b)
+					break;
 				assignment.add(t);
 				visited[j] = true;
 				current = j;

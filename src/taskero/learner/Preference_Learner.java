@@ -59,7 +59,7 @@ public class Preference_Learner {
 //			return learner;
 		learner = new Preference_Learner(calendar, svmAdapter, numOfRuns);
 			
-			return learner;
+		return learner;
 	}
 	
 	
@@ -272,7 +272,7 @@ public class Preference_Learner {
 
 	public void learn(ArrayList<ArrayList<Task>> calendar) throws IOException {
 		
-		CalenderFeatureVector[]cal=setcalenderFeatVector(calendar);
+		CalenderFeatureVector[]cal = setcalenderFeatVector(calendar);
 		svmAdapter.appendToTrainingTupples(calendar,cal,numOfRuns);
 		
 		svmAdapter.runLearning();
