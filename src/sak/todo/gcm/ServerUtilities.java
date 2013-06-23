@@ -5,12 +5,15 @@ import java.io.UnsupportedEncodingException;
 import java.util.Vector;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.simple.JSONObject;
@@ -110,7 +113,7 @@ public class ServerUtilities {
         return meetingID;
 	}
 	
-	public static void updateUserState(Context context, int userId, String userEmail) throws ClientProtocolException, IOException, NameNotFoundException{
+	public static boolean updateUserState(Context context, String userId, String userEmail) throws ClientProtocolException, IOException, NameNotFoundException{
 		// building JSON object to be sent
 		JSONObject user = new JSONObject();
 		user.put("email", userEmail);
@@ -129,6 +132,8 @@ public class ServerUtilities {
         // Execute HTTP Post Request
         HttpResponse response = new DefaultHttpClient().execute(httpput);
         Log.d("SERVER", response.getStatusLine().getReasonPhrase());
+        
+        return (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK);
 	}
 	
 }

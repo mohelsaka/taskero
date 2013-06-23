@@ -111,10 +111,8 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 				meeting.duedate = deadline;
 				
 				//= sending meeting request to the server
-				// getting gmail account
-				AccountManager mgr = AccountManager.get(CreateMeeting.this);
-			    Account[] gAccounts = mgr.getAccountsByType("com.google");
-			    final String email =  gAccounts[0].name;
+				// getting Gmail account
+			    final String email =  GCMUtilities.getGmailAccount();
 			    
 			    // displaying in progress dialog
 			    final ProgressDialog mDialog = new ProgressDialog(CreateMeeting.this);

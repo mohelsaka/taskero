@@ -63,10 +63,28 @@ public class GCMUtilities {
      * <p>
      * If result is empty, the registration has failed.
      *
-     * @return registration id, or empty string if the registration is not
+     * @return server registration id, or empty string if the registration is not
      *         complete.
      */
     private static String getRegistrationId(Context context) {
+        final SharedPreferences prefs = getGCMPreferences(context);
+        String registrationId = prefs.getString(PROPERTY_SERVER_REG_ID, "");
+        if (registrationId.length() == 0) {
+            Log.v(TAG, "Server registration not found.");
+            return "";
+        }
+        return registrationId;
+    }
+    
+    /**
+     * Gets the current server registration id for application on GCM service.
+     * <p>
+     * If result is empty, the registration has failed.
+     *
+     * @return registration id, or empty string if the registration is not
+     *         complete.
+     */
+    public static String getServerRegistrationId() {
         final SharedPreferences prefs = getGCMPreferences(context);
         String registrationId = prefs.getString(PROPERTY_REG_ID, "");
         if (registrationId.length() == 0) {
@@ -178,7 +196,7 @@ public class GCMUtilities {
         editor.commit();
     }
     
-    private static String getGmailAccount(){
+    public static String getGmailAccount(){
     	AccountManager mgr = AccountManager.get(context);
     	Account[] gAccounts = mgr.getAccountsByType("com.google");
     	

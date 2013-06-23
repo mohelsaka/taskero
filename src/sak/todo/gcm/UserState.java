@@ -5,19 +5,29 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.google.android.gms.internal.e;
 import com.learner.svm.SVMAdapter;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import sak.todo.database.Task;
 import sak.todo.database.TasksIterator;
+import sak.todo.gui.CreateMeeting;
 
 
 /**
@@ -91,5 +101,50 @@ public class UserState {
 		state.put("model", arr);
 		
 		return state;
+	}
+	
+	/**
+	 * CAUTION: this function calls {@code GCMUtilities}, thus {@link GCMUtilities} must be initialized first.
+	 * */
+	public static void pushUserState(final Context context){
+		// getting user email
+	    final String email =  GCMUtilities.getGmailAccount();
+		
+	    // getting user id
+	    final String userID = GCMUtilities.getServerRegistrationId();
+	    
+	    final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+	    
+		TimerTask syncProcess = new TimerTask() {
+			
+			@Override
+			public void run() {
+				try {
+					NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+					boolean connected = (activeNetworkInfo != null && activeNetworkInfo.isConnected());
+					
+					if(!connected){
+						reschedule();
+						return;
+					}
+					
+					boolean scucess = ServerUtilities.updateUserState(context, userID, email);
+					if (!scucess) {
+						reschedule();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					reschedule();
+				}
+			}
+			
+			private void reschedule(){
+				Timer t = new Timer();
+				Date d = new Date(System.currentTimeMillis() + (1000 * 30));
+				t.schedule(this, d);
+			}
+		};
+		
+		syncProcess.run();
 	}
 }

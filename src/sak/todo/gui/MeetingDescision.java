@@ -47,18 +47,18 @@ public class MeetingDescision extends Activity{
 				// need the userId and the user email
 				
 				
-				try {
-					ServerUtilities.updateUserState(getApplicationContext(), userId, userEmail);
-				} catch (ClientProtocolException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (NameNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//				try {
+//					ServerUtilities.updateUserState(getApplicationContext(), userId, userEmail);
+//				} catch (ClientProtocolException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (NameNotFoundException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 				sendDescision(true);
 			}
 		});
@@ -73,18 +73,18 @@ public class MeetingDescision extends Activity{
 				// need the userId and the user email
 				
 				
-				try {
-					ServerUtilities.updateUserState(getApplicationContext(), userId, userEmail);
-				} catch (ClientProtocolException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (NameNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//				try {
+//					ServerUtilities.updateUserState(getApplicationContext(), userId, userEmail);
+//				} catch (ClientProtocolException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (NameNotFoundException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 				sendDescision(false);
 			}
 		});
