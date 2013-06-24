@@ -136,4 +136,37 @@ public class ServerUtilities {
         return (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK);
 	}
 	
+	/**
+	 * sends an acceptance on the meeting specified by meetingRemoteID
+	 * 
+	 * @throws IOException 
+	 * @throws ClientProtocolException 
+	 * */
+	public static boolean acceptMeeting(String meetingRemoteID, String userID) throws ClientProtocolException, IOException{
+		// building post request
+		HttpPut httpput = new HttpPut(TASKERO_SERVER_ADDRESS + "meetings/" + meetingRemoteID + "/accept/"+ userID + ".json");
+		
+        // Execute HTTP Post Request
+        HttpResponse response = new DefaultHttpClient().execute(httpput);
+        Log.d("SERVER", response.getStatusLine().getReasonPhrase());
+        
+        return (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK);
+	}
+
+	/**
+	 * sending request to the server to decline the meeting specified by meetingRemoteID
+	 * 
+	 * @throws IOException 
+	 * @throws ClientProtocolException 
+	 * */
+	public static boolean declinetMeeting(String meetingRemoteID, String userID) throws ClientProtocolException, IOException{
+		// building post request
+		HttpPut httpput = new HttpPut(TASKERO_SERVER_ADDRESS + "meetings/" + meetingRemoteID + "/decline/"+ userID + ".json");
+		
+        // Execute HTTP Post Request
+        HttpResponse response = new DefaultHttpClient().execute(httpput);
+        Log.d("SERVER", response.getStatusLine().getReasonPhrase());
+        
+        return (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK);
+	}
 }
