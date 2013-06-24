@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Random;
 
 import sak.todo.database.Task;
+import sak.todo.gcm.UserState;
 import sak.todo.gui.R;
 import sak.todo.gui.agenda.TasksListActivity;
 import taskero.learner.Preference_Learner;
@@ -21,6 +22,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -245,6 +247,13 @@ public class SchedulesActivity extends Activity implements TabListener, OnItemCl
 			
 			Preference_Learner learner = Preference_Learner.getInstance(null, svm, incAndGetQueryID());
 			learner.learn(assignments);
+			
+			// send user state to the server as there are new chages
+			AsyncTask.execute(new Runnable() {
+				public void run() {
+					UserState.pushUserState(SchedulesActivity.this.getApplicationContext());
+				}
+			});
 			
 			Toast.makeText(this, "Learning process DONE!", Toast.LENGTH_LONG).show();
 		} catch (Exception e) {

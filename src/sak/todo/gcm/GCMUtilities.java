@@ -84,7 +84,7 @@ public class GCMUtilities {
      * @return registration id, or empty string if the registration is not
      *         complete.
      */
-    public static String getServerRegistrationId() {
+    public static String getServerRegistrationId(Context context) {
         final SharedPreferences prefs = getGCMPreferences(context);
         String registrationId = prefs.getString(PROPERTY_REG_ID, "");
         if (registrationId.length() == 0) {
@@ -157,7 +157,7 @@ public class GCMUtilities {
                     Log.d("GCM", "Registration id is: " + regid);
                     
                     // sending the registration id to our server
-                    String meetingServerRegID = ServerUtilities.register(GCMUtilities.getGmailAccount(), regid);
+                    String meetingServerRegID = ServerUtilities.register(GCMUtilities.getGmailAccount(context), regid);
                     
                     // Save the registration id - no need to register again.
                     setRegistrationId(context, regid, meetingServerRegID);
@@ -196,7 +196,7 @@ public class GCMUtilities {
         editor.commit();
     }
     
-    public static String getGmailAccount(){
+    public static String getGmailAccount(Context context){
     	AccountManager mgr = AccountManager.get(context);
     	Account[] gAccounts = mgr.getAccountsByType("com.google");
     	

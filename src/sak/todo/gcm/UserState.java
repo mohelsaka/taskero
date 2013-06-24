@@ -19,11 +19,16 @@ import com.learner.svm.SVMAdapter;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.SystemClock;
 
 import sak.todo.database.Task;
 import sak.todo.database.TasksIterator;
@@ -107,44 +112,16 @@ public class UserState {
 	 * CAUTION: this function calls {@code GCMUtilities}, thus {@link GCMUtilities} must be initialized first.
 	 * */
 	public static void pushUserState(final Context context){
-		// getting user email
-	    final String email =  GCMUtilities.getGmailAccount();
-		
-	    // getting user id
-	    final String userID = GCMUtilities.getServerRegistrationId();
-	    
-	    final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-	    
-		TimerTask syncProcess = new TimerTask() {
+	    // check if there are a service that already trying to sync
+		SharedPreferences pref = context.getSharedPreferences(SyncerAlarm.class.getSimpleName(), Context.MODE_WORLD_READABLE);
+
+		if(!pref.getBoolean(SyncerAlarm.SYNCING_USER_STATE, false)){
+			pref.edit().putBoolean(SyncerAlarm.SYNCING_USER_STATE, true).commit();
 			
-			@Override
-			public void run() {
-				try {
-					NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-					boolean connected = (activeNetworkInfo != null && activeNetworkInfo.isConnected());
-					
-					if(!connected){
-						reschedule();
-						return;
-					}
-					
-					boolean scucess = ServerUtilities.updateUserState(context, userID, email);
-					if (!scucess) {
-						reschedule();
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					reschedule();
-				}
-			}
-			
-			private void reschedule(){
-				Timer t = new Timer();
-				Date d = new Date(System.currentTimeMillis() + (1000 * 30));
-				t.schedule(this, d);
-			}
-		};
+			SyncerAlarm s = new SyncerAlarm();
+			s.reschedule(context, 1000 * 4);
+		}
 		
-		syncProcess.run();
 	}
+	
 }

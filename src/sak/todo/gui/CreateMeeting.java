@@ -112,7 +112,7 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 				
 				//= sending meeting request to the server
 				// getting Gmail account
-			    final String email =  GCMUtilities.getGmailAccount();
+			    final String email =  GCMUtilities.getGmailAccount(getApplicationContext());
 			    
 			    // displaying in progress dialog
 			    final ProgressDialog mDialog = new ProgressDialog(CreateMeeting.this);
