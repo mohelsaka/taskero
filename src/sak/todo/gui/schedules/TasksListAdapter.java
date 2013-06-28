@@ -8,6 +8,7 @@ import sak.todo.database.Task;
 import sak.todo.gui.R;
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,13 +45,18 @@ public class TasksListAdapter extends ArrayAdapter<Task>{
 		
 		LinearLayout taskPrioityLabel = (LinearLayout)layout.findViewById(R.id.task_priority_label);
 		int priorty = t.priority;
-		int color = Color.rgb(25 * priorty, 25 * priorty, 25 * priorty);
-		taskPrioityLabel.setBackgroundColor(color);
+//		int color = Color.rgb(25 * priorty, 25 * priorty, 25 * priorty);
+		taskPrioityLabel.setBackgroundColor(Task.PRIORITY_COLORS[priorty]);
 		
 		float duration = t.estimate;
 		TextView durationView = (TextView) layout.findViewById(R.id.task_duration);
 		durationView.setText(""+duration+ " hours");
 		
+		if(t.schedulledNow){ 
+			layout.setBackgroundColor(Color.GRAY);
+		}
+		
 		return layout;
+		
 	}
 }

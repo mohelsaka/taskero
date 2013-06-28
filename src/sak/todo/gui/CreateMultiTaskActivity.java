@@ -3,6 +3,7 @@ package sak.todo.gui;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 
@@ -394,7 +395,24 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 					for (int i = 0; i < deletedAssignments.size(); i++) {
 						assignments.remove(deletedAssignments.get(i));
 					}
-					
+					for (int i = 0; i < assignments.size(); i++) {
+						for (int j = 0; j < assignments.get(i).size(); j++) {
+							assignments.get(i).get(j).schedulledNow=true;
+						}
+					}
+					TasksIterator itr = Task.getScheduledTasks(new Date(System.currentTimeMillis()), new Date(Reasoner.INFINITY));
+					Task task = itr.nextTask();
+					ArrayList<Task> preset = new ArrayList<Task>();
+					while (task != null) {
+						preset.add(task);
+	 					task = itr.nextTask();
+					}
+					for (int i = 0; i < assignments.size(); i++) {
+						for (int p = 0; p < preset.size(); p++) {
+							assignments.get(i).add(preset.get(p));
+						}
+						Collections.sort(assignments.get(i));
+					}
 					
 				}
 				else{
@@ -481,6 +499,12 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 				}
 				
 				Intent intent = new Intent(CreateMultiTaskActivity.this, SchedulesActivity.class);
+				for (int i = 0; i < assignments.size(); i++) {
+					for (int j = 0; j < assignments.get(i).size(); j++) {
+						Log.d("debug", "asss: "+assignments.get(i).get(j).schedulledNow);
+						
+					}
+				}
 				intent.putExtra("assignments", assignments);
 
 				startActivity(intent);

@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -68,6 +69,13 @@ public class SchedulesActivity extends Activity implements TabListener, OnItemCl
 		if(b != null && ((assignmentsObject = b.get("assignments")) != null))
 			assignments = (ArrayList<ArrayList<Task>>) assignmentsObject;
 		
+		
+		for (int i = 0; i < assignments.size(); i++) {
+			for (int j = 0; j < assignments.get(i).size(); j++) {
+				Log.d("debug", "asss hh: "+assignments.get(i).get(j).schedulledNow);
+				
+			}
+		}
 //		buildRedundantAssignments();
 		
 		setContentView(R.layout.schedules_layout);
@@ -105,6 +113,7 @@ public class SchedulesActivity extends Activity implements TabListener, OnItemCl
 	private void loadAssignment(int assignmentIndex){
 		// lazy load for adapters and caching them
 		if(adapters[assignmentIndex] == null){
+			
 			adapters[assignmentIndex] = new TasksListAdapter(this, R.layout.list_tasks,
 					R.id.task_body, assignments.get(assignmentIndex)); 
 		}
@@ -186,6 +195,10 @@ public class SchedulesActivity extends Activity implements TabListener, OnItemCl
 		
 		// set the task and its view that will be updated after the dialog returns
 		currentlyUpdatedTask = adapter.getItem(arg2);
+//		if (!currentlyUpdatedTask.schedulledNow) {
+//			Toast.makeText(this, "Task Already Schedulled", Toast.LENGTH_SHORT).show();
+//			return;
+//		}
 		currentlyUpdatedTextView = (TextView)view.findViewById(R.id.task_date);
 		
 		// initialize date time slider with the the time of that task
