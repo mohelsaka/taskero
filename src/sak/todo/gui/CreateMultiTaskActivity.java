@@ -64,7 +64,7 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 	ArrayList<PointConstraint> Constraints;
 	boolean listofAddedTaskAppears;
 	public static final String PREFS_NAME = "MyPrefsFile";
-	protected static final boolean GA_ENABLED = false;
+	protected static final boolean GA_ENABLED = true;
 	// ArrayList<Constraint> constraints;
 	public SharedPreferences sharedPrefs;
 	private int screenWidth;
@@ -174,9 +174,9 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 	    actionBar.setStackedBackgroundDrawable(new ColorDrawable(R.color.tabsColor));
 		
 		
-		Tab tab1= actionBar.newTab().setText("Quick Task").setTabListener(this);
-		Tab tab2= actionBar.newTab().setText("Single Task").setTabListener(this);
-		Tab tab3= actionBar.newTab().setText("Multi task").setTabListener(this);
+		Tab tab1= actionBar.newTab().setText("Quick Add").setTabListener(this);
+		Tab tab2= actionBar.newTab().setText("Add Task").setTabListener(this);
+		Tab tab3= actionBar.newTab().setText("Add Meeting").setTabListener(this);
 		actionBar.addTab(tab1);
 		actionBar.addTab(tab2);
 		actionBar.addTab(tab3);
@@ -289,11 +289,13 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 		    public void onGlobalLayout() {
 		        int heightDiff = activityRootView.getRootView().getHeight() - activityRootView.getHeight();
 		        if (heightDiff > 150) { // if more than 100 pixels, its probably a keyboard...
+				if(CreateMultiTaskActivity.this.findViewById(R.id.SaveAll)==null)return;
 		        	CreateMultiTaskActivity.this.findViewById(R.id.SaveAll).setVisibility(View.INVISIBLE);
 					CreateMultiTaskActivity.this.findViewById(R.id.AddTask).setVisibility(View.INVISIBLE);
 		        }
 		        else
 		        {
+				if(CreateMultiTaskActivity.this.findViewById(R.id.SaveAll)==null)return;
 		        	CreateMultiTaskActivity.this.findViewById(R.id.SaveAll).setVisibility(View.VISIBLE);
 					CreateMultiTaskActivity.this.findViewById(R.id.AddTask).setVisibility(View.VISIBLE);
 		        }
@@ -317,23 +319,50 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 						tasks[i-1]=addedTasks.get(i);
 					}
 					Point[] constraints=new Point[Constraints.size()];
+					ArrayList<Point> points=new ArrayList<Point>();
 					for (int i = 0; i < Constraints.size(); i++) {
 						Task t1=Constraints.get(i).t1;
 						Task t2=Constraints.get(i).t2;
 						int index1=-1,index2=-1;
+						Point p=new Point(-1,-1);
 						for (int j = 0; j < tasks.length; j++) {
 							if(t1.body.equals(tasks[j].body)){
 								index1=j;
+								p.x=j;
+								if(p.y!=-1){
+									points.add(p);
+									break;
+								}
 							}
 							if(t2.body.equals(tasks[j].body)){
 								index2=j;
+								p.y=j;
+								if(p.x!=-1){
+									points.add(p);
+									break;
+								}
+								
+								
 							}
 						}
 						constraints[i]=new Point(index1, index2);
 					}
 					ScheduleTasks s=new ScheduleTasks(tasks, constraints);
 					assignments=s.getAssignments();
-					ArrayList<ArrayList<Task>> deletedTasks=new ArrayList<ArrayList<Task>>();
+					
+					ArrayList<ArrayList<Task>> deletedAssignments=new ArrayList<ArrayList<Task>>();
+					
+					for (int i = 0; i < points.size(); i++) {
+						Point p=points.get(i);
+						for (int j = 0; j < assignments.size(); j++) {
+							
+						
+							ArrayList<Task >assign1=assignments.get(j);
+							if(assign1.get(p.x).duedate.getTime()>assign1.get(p.y).duedate.getTime()){
+								deletedAssignments.add(assign1);
+							}
+						}
+					}
 					for (int i = 0; i < assignments.size(); i++) {
 						
 						for (int j = i+1; j < assignments.size(); j++) {
@@ -351,22 +380,21 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 								min=(long) ((double)((assign2.get(k).duedate.getTime()/15)+1)*15);
 								assign2.get(k).duedate.setTime(min);
 								
-								Log.d("debug", "assign1 "+assign1.get(k).duedate);
-								Log.d("debug", "assign2 "+assign2.get(k).duedate);
+								
 								if(Math.abs(assign1.get(k).duedate.getTime()-assign2.get(k).duedate.getTime())>0.15*60*60){// half an hour
 									deleted=false;
 									break;
 								}
 							}
 							if(deleted){
-								Log.d("debug", "deleted");
-								deletedTasks.add(assign2);
+								deletedAssignments.add(assign2);
 							}
 						}
 					}
-					for (int i = 0; i < deletedTasks.size(); i++) {
-						assignments.remove(deletedTasks.get(i));
+					for (int i = 0; i < deletedAssignments.size(); i++) {
+						assignments.remove(deletedAssignments.get(i));
 					}
+					
 					
 				}
 				else{
@@ -593,7 +621,7 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 						task.setText(((TextView) view).getText());
 						
 						task.setTextSize(18);
-						task.setPadding(30, 0, 0, 0);
+						task.setPadding(0, 0, 30, 0);
 						
 						layoutBefore.findViewById(R.id.delete).setPadding(50, 0, 0, 0);
 						layoutBefore.findViewById(R.id.delete).setBackgroundResource(R.drawable.cancel);
@@ -627,7 +655,7 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 							task.setText(((TextView) view).getText());
 							
 							task.setTextSize(18);
-							layoutAfter.findViewById(R.id.textview).setPadding(30, 0, 0, 0);
+//							layoutAfter.findViewById(R.id.textview).setPadding(30, 0, 0, 0);
 							
 							task.setPadding(0, 0, 30, 0);
 							layoutAfter.findViewById(R.id.delete).setBackgroundResource(R.drawable.cancel);
