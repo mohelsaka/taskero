@@ -46,6 +46,10 @@ public class ScheduleTasks {
 		for (int i = 0; i < tasks.length; i++) {
 			Log.d("debug", "Task "+tasks[i].toString());
 		}
+		Log.d("debug", "time slots num "+timeSlots.length);
+		for (int i = 0; i < timeSlots.length; i++) {
+			Log.d("debug", "time slot"+ timeSlots[i].getStart().toString());
+		}
 		
 		for (int i = 0; i < PreferenceModel.PreferencesNum(); i++) {
 			Log.d("debug", "pref: "+i);
@@ -189,7 +193,7 @@ public class ScheduleTasks {
 			list.add(addTimeSlot(c.getTime(), maxDeadline));	
 		}
 		
-		list.remove(0);
+		
 		/*
 		 * Adjusting Time slots to fit tasks 
 		 */
@@ -207,7 +211,7 @@ public class ScheduleTasks {
 				
 			}
 		}
-		
+		if(list.size()>1)list.remove(0);
 		TimeSlot[] result=new TimeSlot[list.size()];
 		k=0;
 		while(list.size()>0){

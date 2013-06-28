@@ -85,7 +85,7 @@ public class SchedulesActivity extends Activity implements TabListener, OnItemCl
 			adapters = new TasksListAdapter[numOfAssignments];
 			
 			if (numOfAssignments == 0) {
-				Toast.makeText(this, "No schdules are available", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, "No schedules are available", Toast.LENGTH_LONG).show();
 				finish();
 			}else{
 				// adding tab for each assignment

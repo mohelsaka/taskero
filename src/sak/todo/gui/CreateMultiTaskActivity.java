@@ -107,7 +107,6 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 		priorityhigh.setClickable(false);
 		bodyView.setEnabled(false);
 		deadLineView.setClickable(false);
-		dueDateView.setClickable(false);
 		CreateMultiTaskActivity.this.findViewById(R.id.SaveAll).setVisibility(View.GONE);
 		CreateMultiTaskActivity.this.findViewById(R.id.AddTask).setVisibility(View.GONE);
 		CreateMultiTaskActivity.this.findViewById(R.id.AddTask).setEnabled(false);
@@ -137,7 +136,6 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 		prioritylow.setClickable(true);
 		prioritymedium.setClickable(true);
 		deadLineView.setClickable(true);
-		dueDateView.setClickable(true);
 		CreateMultiTaskActivity.this.findViewById(R.id.SaveAll).setVisibility(View.VISIBLE);
 		CreateMultiTaskActivity.this.findViewById(R.id.AddTask).setVisibility(View.VISIBLE);
 		CreateMultiTaskActivity.this.findViewById(R.id.AddTask).setEnabled(true);
@@ -152,6 +150,12 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 //		((RelativeLayout)findViewById(R.id.RelativeLayout1)).addView(v);
 		listofAddedTaskAppears = false;
 		
+	}
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO Auto-generated method stub
+		super.onActivityResult(requestCode, resultCode, data);
+		finish();
 	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -190,7 +194,6 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 		prioritymedium = (Button) this.findViewById(R.id.ScrollViewParent).findViewById(R.id.rate_medium);
 		estimateView = (EditText) this.findViewById(R.id.ScrollViewParent).findViewById(R.id.editText1);
 		deadLineView = (Button) this.findViewById(R.id.ScrollViewParent).findViewById(R.id.deadline);
-		dueDateView = (Button) this.findViewById(R.id.ScrollViewParent).findViewById(R.id.duedate);
 
 		sharedPrefs = getSharedPreferences(PREFS_NAME, 0);
 		Constraints=new ArrayList<PointConstraint>();
@@ -506,7 +509,7 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 				
 				intent.putExtra("assignments", assignments);
 
-				startActivity(intent);
+				startActivityForResult(intent,0);
 			}
 		});
 		findViewById(R.id.AddTask).setOnClickListener(new OnClickListener() {
@@ -864,7 +867,6 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 	private Button prioritylow,priorityhigh,prioritymedium;
 	private EditText estimateView;
 	private Button deadLineView;
-	private Button dueDateView;
 	private Button dateText;
 
 	private final DateSlider.OnDateSetListener mDateTimeSetListener = new DateSlider.OnDateSetListener() {
@@ -917,5 +919,6 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 		// TODO Auto-generated method stub
 		
 	}
+	
 
 }

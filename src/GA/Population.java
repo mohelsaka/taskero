@@ -70,14 +70,34 @@ public class Population {
 		
 		TimeSlot[]ts=ScheduleTasks.getFreeTimeSlots(result.tasks[index].estimate, result.tasks[index].deadline);
 		
-		double[][]cost=HandleUnscheduledTasks.FillHungarianTable(inv.tasks, ts, r.nextInt(2));
-		HungarianMethod hg=new HungarianMethod(cost);
-		int[] assignment = hg.getAssignment();		
-		result.tasks[index].duedate = ts[assignment[index]].getStart();
-		result.tasksCost[index]=cost[index][assignment[index]];
+		
+		// updated 
+				
+		int winner=r.nextInt(ts.length);
+		result.tasks[index].duedate = ts[winner].getStart();
+		
+		if (ts[winner].getDuration() < result.tasks[index].estimate*60
+				|| ts[winner].getStart().after(result.tasks[index].deadline) 
+				|| ts[winner].getDuration()==-1) {
+			result.tasksCost[index] = M;
+		}
+
+		
 		result.fitness=inv.fitness-inv.tasksCost[index]+result.tasksCost[index];
 		if(result.fitness<M)result.feasible=true;
 //		MinimumFitness=Math.min(MinimumFitness, result.fitness);
+		Log.d("debug", "finish mutation");
+		
+		// finish updated
+		
+//		double[][]cost=HandleUnscheduledTasks.FillHungarianTable(inv.tasks, ts, r.nextInt(2));
+//		HungarianMethod hg=new HungarianMethod(cost);
+//		int[] assignment = hg.getAssignment();		
+//		result.tasks[index].duedate = ts[assignment[index]].getStart();
+//		result.tasksCost[index]=cost[index][assignment[index]];
+//		result.fitness=inv.fitness-inv.tasksCost[index]+result.tasksCost[index];
+//		if(result.fitness<M)result.feasible=true;
+////		MinimumFitness=Math.min(MinimumFitness, result.fitness);
 		Log.d("debug", "finish mutation");
 		return result;
 	}
