@@ -70,12 +70,7 @@ public class SchedulesActivity extends Activity implements TabListener, OnItemCl
 			assignments = (ArrayList<ArrayList<Task>>) assignmentsObject;
 		
 		
-		for (int i = 0; i < assignments.size(); i++) {
-			for (int j = 0; j < assignments.get(i).size(); j++) {
-				Log.d("debug", "asss hh: "+assignments.get(i).get(j).schedulledNow);
-				
-			}
-		}
+		
 //		buildRedundantAssignments();
 		
 		setContentView(R.layout.schedules_layout);

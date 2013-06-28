@@ -392,9 +392,12 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 							}
 						}
 					}
+					
+					
 					for (int i = 0; i < deletedAssignments.size(); i++) {
 						assignments.remove(deletedAssignments.get(i));
 					}
+					
 					for (int i = 0; i < assignments.size(); i++) {
 						for (int j = 0; j < assignments.get(i).size(); j++) {
 							assignments.get(i).get(j).schedulledNow=true;
@@ -413,6 +416,7 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 						}
 						Collections.sort(assignments.get(i));
 					}
+					
 					
 				}
 				else{
@@ -499,12 +503,7 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 				}
 				
 				Intent intent = new Intent(CreateMultiTaskActivity.this, SchedulesActivity.class);
-				for (int i = 0; i < assignments.size(); i++) {
-					for (int j = 0; j < assignments.get(i).size(); j++) {
-						Log.d("debug", "asss: "+assignments.get(i).get(j).schedulledNow);
-						
-					}
-				}
+				
 				intent.putExtra("assignments", assignments);
 
 				startActivity(intent);
@@ -647,7 +646,6 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 						task.setTextSize(18);
 						task.setPadding(0, 0, 30, 0);
 						
-						layoutBefore.findViewById(R.id.delete).setPadding(50, 0, 0, 0);
 						layoutBefore.findViewById(R.id.delete).setBackgroundResource(R.drawable.cancel);
 
 						view.setVisibility(View.VISIBLE);

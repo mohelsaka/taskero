@@ -189,7 +189,7 @@ public class ScheduleTasks {
 			list.add(addTimeSlot(c.getTime(), maxDeadline));	
 		}
 		
-		
+		list.remove(0);
 		/*
 		 * Adjusting Time slots to fit tasks 
 		 */
