@@ -211,7 +211,6 @@ public class ScheduleTasks {
 				
 			}
 		}
-		if(list.size()>1)list.remove(0);
 		TimeSlot[] result=new TimeSlot[list.size()];
 		k=0;
 		while(list.size()>0){
