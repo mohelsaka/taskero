@@ -314,7 +314,24 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 		findViewById(R.id.SaveAll).setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Log.d("debug", "Save alll ........... ");
-
+				SVMAdapter svmAdapter;
+				Preference_Learner pl;
+				int numOfRuns;
+				try {
+					svmAdapter = new SVMAdapter(getApplicationContext());
+					svmAdapter.init();
+					numOfRuns = sharedPrefs.getInt("numberOfRuns", 0);
+					pl = new Preference_Learner(svmAdapter);
+				} catch (NameNotFoundException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+					
+					
 				ArrayList<ArrayList<Task>> assignments = null;
 				// GA 
 				if(GA_ENABLED){
@@ -431,7 +448,7 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 						preset.add(task);
 	 					task = itr.nextTask();
 					}
-					Reasoner reasoner = Reasoner.instance();
+					Reasoner reasoner = new Reasoner(pl);
 					reasoner.setPresetTasks(preset);
 					
 						try {
@@ -440,60 +457,10 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-
-						SVMAdapter svmAdapter;
-						try {
-							Log.d("assignments length", assignments.size() + "");
-							svmAdapter = new SVMAdapter(getApplicationContext());
-
-							int numOfRuns = sharedPrefs.getInt("numberOfRuns", 0);
-							Preference_Learner pl = Preference_Learner.getInstance(assignments, svmAdapter, numOfRuns);
-							try {
-								svmAdapter.init();
-								assignments = pl.rank(pl.setcalenderFeatVector(assignments));
-
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-
-						} catch (NameNotFoundException e) {
-							e.printStackTrace();
-						}
 					
 
 				}
-				
 
-				if(GA_ENABLED){
-				
-				
-				
-				// amr-> Ranker
-				SVMAdapter svmAdapter;
-				try {
-					
-					if(assignments.size()>1){
-						Log.d("debug", assignments.size() + "");
-						svmAdapter = new SVMAdapter(getApplicationContext());
-
-						int numOfRuns = sharedPrefs.getInt("numberOfRuns", 0);
-						Preference_Learner pl = Preference_Learner.getInstance(assignments, svmAdapter, numOfRuns);
-						try {
-							svmAdapter.init();
-							assignments = pl.rank(pl.setcalenderFeatVector(assignments));
-							Log.d("debug", assignments.size() + "");
-						} catch (IOException e) {
-							Log.d("debug", "IOException "+e.getLocalizedMessage());
-							e.printStackTrace();
-					}
-					}
-
-				} catch (NameNotFoundException e) {
-					Log.d("debug", "Name not found"+e.getLocalizedMessage());
-					e.printStackTrace();
-				}
-				Log.d("debug", "here");
-				}
 				// output
 				for (int i = 0; i < assignments.size(); i++) {
 					Log.d("debug", "assignment: " + i);

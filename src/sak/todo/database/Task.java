@@ -539,6 +539,15 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 		t.deadline = this.deadline;
 		return t;
 	}
+	public Task clone(Task task) throws CloneNotSupportedException {
+		task.duedate = (Date)duedate.clone();
+		task.estimate = estimate;
+		task.body = body;
+		task.id=id;
+		task.priority = priority;
+		task.deadline = deadline;
+		return task;
+	}
 
 	public Task(Parcel in) {
 		this();
