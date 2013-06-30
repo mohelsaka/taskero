@@ -13,6 +13,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Handling of GCM messages.
@@ -42,6 +43,7 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 		} else {
 //			sendNotification("Received: " + intent.getExtras().toString());
 			Log.d("GCM-message", intent.getExtras().toString());
+			Toast.makeText(context, intent.getExtras().toString(), Toast.LENGTH_LONG).show();
 		}
 		
 		setResultCode(Activity.RESULT_OK);

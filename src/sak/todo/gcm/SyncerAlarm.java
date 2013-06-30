@@ -1,5 +1,6 @@
 package sak.todo.gcm;
 
+import sak.todo.database.DBHelper;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -22,6 +23,10 @@ public class SyncerAlarm extends BroadcastReceiver{
 		
 		// getting application context
 		context = context.getApplicationContext();
+		
+		// Initialize utilities
+		GCMUtilities.initialize(context);
+		DBHelper.initialize(context);
 
 		final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
