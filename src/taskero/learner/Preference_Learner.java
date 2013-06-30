@@ -156,16 +156,17 @@ public class Preference_Learner {
 	public float evaluate(Date start, Date end) throws IOException {
 		float weight = 0;
 		HashMap<Integer, Float> weights = svmAdapter.getSVMWeights(); // =
-																		// svmadapter.getweights
+		int duration = 24*(end.getDay() - start.getDay()) + end.getHours() - start.getHours();			
+		// svmadapter.getweights
 		int[] temp = new int[35];
 		for (long i = start.getTime(); i < end.getTime(); i += 60 * 60000) {
 			Date d = new Date(i);
 			temp[d.getDay() * NUM_OF_TIME_BLOCKS
-					+ ff.get(BLOCKS[(int) i / (60 * 60000)]).intValue()]++;
+					+ ff.get(BLOCKS[d.getHours()]).intValue()]++;
 		}
 		for (int i = 0; i < temp.length; i++) {
 			if (weights.get(i + 1) != null)
-				weight += temp[i] * weights.get(i + 1);
+				weight += temp[i] * weights.get(i + 1)/duration;
 		}
 		return weight;
 	}

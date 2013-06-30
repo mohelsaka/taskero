@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import sak.todo.database.DBHelper;
 import sak.todo.database.Task;
 import sak.todo.database.TasksIterator;
+import taskero.learner.Preference_Learner;
 import android.graphics.Point;
 import android.util.Log;
 
@@ -24,7 +25,7 @@ public class ScheduleTasks {
 	/**
 	 * Constructor for scheduling tasks.
 	 */
-	public ScheduleTasks(Task[] tasks,Point[] constraints) {
+	public ScheduleTasks(Task[] tasks,Point[] constraints,Preference_Learner pl) {
 		// TODO Auto-generated constructor stub
 		Population pop=new Population();
 		pop.Generation=1; 
@@ -46,18 +47,18 @@ public class ScheduleTasks {
 		for (int i = 0; i < tasks.length; i++) {
 			Log.d("debug", "Task "+tasks[i].toString());
 		}
-		Log.d("debug", "time slots num "+timeSlots.length);
-		for (int i = 0; i < timeSlots.length; i++) {
-			Log.d("debug", "time slot"+ timeSlots[i].getStart().toString());
-			Log.d("debug", "time slot"+ timeSlots[i].getDuration());
-		}
+//		Log.d("debug", "time slots num "+timeSlots.length);
+//		for (int i = 0; i < timeSlots.length; i++) {
+//			Log.d("debug", "time slot"+ timeSlots[i].getStart().toString());
+//			Log.d("debug", "time slot"+ timeSlots[i].getDuration());
+//		}
 		
 		for (int i = 0; i < PreferenceModel.PreferencesNum(); i++) {
-			Log.d("debug", "pref: "+i);
+//			Log.d("debug", "pref: "+i);
 			Individual individual=new Individual(tasks);
 			
 			
-			HandleUnscheduledTasks h=new HandleUnscheduledTasks(tasks,timeSlots,i,constraints);
+			HandleUnscheduledTasks h=new HandleUnscheduledTasks(tasks,timeSlots,i,constraints,pl);
 			
 			
 			for (int j = 0; j < tasks.length; j++) {
@@ -71,7 +72,7 @@ public class ScheduleTasks {
 			
 			for (int j = 0; j < h.timeSlotsTaken.size(); j++) {
 				int ts=h.timeSlotsTaken.get(j);
-				Log.d("debug", "indexback : "+ts);
+//				Log.d("debug", "indexback : "+ts);
 				timeSlots[ts].setDuration(-1);
 				
 			}
@@ -85,7 +86,12 @@ public class ScheduleTasks {
 			
 			Collections.sort(pop.individuals);
 			int len=pop.individuals.size();
-			if(len<2)break;
+			if(len==1){
+				pop.individuals.add(pop.individuals.get(0));
+				len++;
+			}
+			
+//			if(len<2)break;
 			
 			// Select pair to mate from best ranked individuals for Crossover
 			Individual inv1=pop.individuals.get(len-1);
@@ -127,7 +133,6 @@ public class ScheduleTasks {
 			for (int k = 0; k < nowTasks.length; k++) {
 				tks.add(nowTasks[k]);
 			}
-			Log.d("debug", "assign: ");
 			assignments.add(tks);
 		}
 		

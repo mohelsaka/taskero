@@ -315,7 +315,7 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 			public void onClick(View v) {
 				Log.d("debug", "Save alll ........... ");
 				SVMAdapter svmAdapter;
-				Preference_Learner pl;
+				Preference_Learner pl = null;
 				int numOfRuns;
 				try {
 					svmAdapter = new SVMAdapter(getApplicationContext());
@@ -368,7 +368,7 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 						}
 						constraints[i]=new Point(index1, index2);
 					}
-					ScheduleTasks s=new ScheduleTasks(tasks, constraints);
+					ScheduleTasks s=new ScheduleTasks(tasks, constraints,pl);
 					assignments=s.getAssignments();
 					
 					ArrayList<ArrayList<Task>> deletedAssignments=new ArrayList<ArrayList<Task>>();

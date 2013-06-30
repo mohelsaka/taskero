@@ -1,10 +1,12 @@
 package GA;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
 import sak.todo.database.Task;
+import taskero.learner.Preference_Learner;
 import android.graphics.Point;
 import android.util.Log;
 
@@ -18,26 +20,26 @@ public class HandleUnscheduledTasks {
 	static Point[] constraints;
 	ArrayList<Integer> timeSlotsTaken;
 	public HandleUnscheduledTasks(Task[] tasks, TimeSlot[] timeSlots,
-			int preferenceIndex,Point[] constraints) {
-		Log.d("debug", "ereeeee");
+			int preferenceIndex,Point[] constraints,Preference_Learner pl) {
+//		Log.d("debug", "ereeeee");
 		timeSlotsTaken=new ArrayList<Integer>();
 		HandleUnscheduledTasks.constraints=constraints;
 		tasksCost=new double[tasks.length];
-		double[][] array = FillHungarianTable(tasks, timeSlots, preferenceIndex);
+		double[][] array = FillHungarianTable(tasks, timeSlots, preferenceIndex,pl);
 
-		for (int i = 0; i < array.length; i++) {
-			Log.d("debug", Arrays.toString(array[i]));
-		}
+//		for (int i = 0; i < array.length; i++) {
+//			Log.d("debug", Arrays.toString(array[i]));
+//		}
 		HungarianMethod hg = new HungarianMethod(array);
 		int[] assignment = hg.getAssignment();
 		double cost = hg.getCost();
 		Cost = cost;
-		Log.d("debug", "Cost " + cost);
+//		Log.d("debug", "Cost " + cost);
 
 		successfully = true;
 		for (int i = 0; i < assignment.length; i++) {
 			tasks[i].duedate = timeSlots[assignment[i]].getStart();
-			Log.d("debug", "index: "+assignment[i]);
+//			Log.d("debug", "index: "+assignment[i]);
 			timeSlotsTaken.add(assignment[i]);
 			tasksCost[i]=array[i][assignment[i]];
 			if (array[i][assignment[i]] >= M) { // invalid option.
@@ -54,7 +56,7 @@ public class HandleUnscheduledTasks {
 	static final double M = 2000;
 
 	public static double[][] FillHungarianTable(Task[] tasks,
-			TimeSlot[] timeSlots, int index) {
+			TimeSlot[] timeSlots, int index,Preference_Learner pl) {
 		// TODO Auto-generated method stub
 
 		double[][] cost = new double[tasks.length][timeSlots.length];
@@ -75,13 +77,27 @@ public class HandleUnscheduledTasks {
 				else
 					/*
 					 * Equation cost= |Pi - Vj| + (Dj - Ti) * Vj where Pi:
-					 * preference i, Vj: focus rate j, Dj: duration of time slot
+					 * preference i, Vj: weight of evaluation function j, Dj: duration of time slot
 					 * Ti: duration of task. tasks[i].impression should be
 					 * replace in GA with preferences1.
 					 */
-					cost[i][j] = Math.abs(tasks[i].priority*3 - timeSlots[j].getFocusRate())
-							+ ((timeSlots[j].getDuration() - tasks[i].estimate*60)/60f)
-							* timeSlots[j].getFocusRate();
+					
+					try{
+						float weight =pl.evaluate(timeSlots[j].getStart(), timeSlots[j].getEnd());
+//						Log.d("debug", "weight "+ weight);
+						if(weight<0)weight=0;
+						if(weight>8)weight=8;
+						weight=weight%8;
+//						Log.d("debug", "weight "+ weight);
+						cost[i][j] = Math.abs(tasks[i].priority*3 -  weight )
+						+ ((timeSlots[j].getDuration() - tasks[i].estimate*60)/60f)
+						*  weight;
+					}catch (IOException e) {
+						// TODO: handle exception
+					}
+//					cost[i][j] = Math.abs(tasks[i].priority*3 - timeSlots[j].getFocusRate())
+//							+ ((timeSlots[j].getDuration() - tasks[i].estimate*60)/60f)
+//							* timeSlots[j].getFocusRate();
 				
 			}
 		}

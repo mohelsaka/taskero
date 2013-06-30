@@ -12,7 +12,7 @@ public class Population {
 	ArrayList<Individual> individuals; // feasible solutions 
 	int Generation; // Number of Generation.
 	static int M=2000;
-	static int MaxGenerations=5;
+	static int MaxGenerations=10;
 	static long timeElapes;
 	static long maxTime=2000;
 //	static double MinimumFitness;
@@ -42,12 +42,12 @@ public class Population {
 				result.tasksCost[i]=inv2.tasksCost[i];
 				fit+=inv2.tasksCost[i];
 			}
-			Log.d("debug", "crossover: "+result.tasks[i].duedate);
+//			Log.d("debug", "crossover: "+result.tasks[i].duedate);
 		}
 		result.feasible=true;
 		Arrays.sort(result.tasks);
 		for (int i = 0; i < result.tasks.length; i++) {
-			Log.d("debug", "sortcross: "+result.tasks[i].duedate);
+//			Log.d("debug", "sortcross: "+result.tasks[i].duedate);
 		}
 		for (int i = 0; i < result.tasks.length-1; i++) {
 			Calendar c=Calendar.getInstance();
@@ -86,7 +86,7 @@ public class Population {
 		result.fitness=inv.fitness-inv.tasksCost[index]+result.tasksCost[index];
 		if(result.fitness<M)result.feasible=true;
 //		MinimumFitness=Math.min(MinimumFitness, result.fitness);
-		Log.d("debug", "finish mutation");
+//		Log.d("debug", "finish mutation "+ result.feasible);
 		
 		// finish updated
 		
@@ -98,7 +98,7 @@ public class Population {
 //		result.fitness=inv.fitness-inv.tasksCost[index]+result.tasksCost[index];
 //		if(result.fitness<M)result.feasible=true;
 ////		MinimumFitness=Math.min(MinimumFitness, result.fitness);
-		Log.d("debug", "finish mutation");
+		
 		return result;
 	}
 	public boolean StoppingCriteriaReached(){
