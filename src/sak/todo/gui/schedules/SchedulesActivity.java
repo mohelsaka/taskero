@@ -3,6 +3,7 @@ package sak.todo.gui.schedules;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Random;
@@ -24,6 +25,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -70,6 +72,8 @@ public class SchedulesActivity extends Activity implements TabListener, OnItemCl
 		if(b != null && ((assignmentsObject = b.get("assignments")) != null))
 			assignments = (ArrayList<ArrayList<Task>>) assignmentsObject;
 		
+		
+		
 //		buildRedundantAssignments();
 		
 		setContentView(R.layout.schedules_layout);
@@ -84,11 +88,12 @@ public class SchedulesActivity extends Activity implements TabListener, OnItemCl
 			adapters = new TasksListAdapter[numOfAssignments];
 			
 			if (numOfAssignments == 0) {
-				Toast.makeText(this, "No schdules are available", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, "No schedules are available", Toast.LENGTH_LONG).show();
 				finish();
 			}else{
 				// adding tab for each assignment
 				for (int i = 0; i < numOfAssignments; i++) {
+					Collections.sort(assignments.get(i));
 					Tab tab = actionBar.newTab().setText(String.format("Plan#%d", i)).setTabListener(this);
 					actionBar.addTab(tab);
 				}
@@ -107,6 +112,7 @@ public class SchedulesActivity extends Activity implements TabListener, OnItemCl
 	private void loadAssignment(int assignmentIndex){
 		// lazy load for adapters and caching them
 		if(adapters[assignmentIndex] == null){
+			
 			adapters[assignmentIndex] = new TasksListAdapter(this, R.layout.list_tasks,
 					R.id.task_body, assignments.get(assignmentIndex)); 
 		}
@@ -117,43 +123,6 @@ public class SchedulesActivity extends Activity implements TabListener, OnItemCl
 		// setting the new adapter
 		tasksList.setAdapter(adapters[assignmentIndex]);
 		tasksList.setOnItemClickListener(this);
-	}
-	
-	private void buildRedundantAssignments(){
-		assignments = new ArrayList<ArrayList<Task>>();
-
-		Task[] tasks = new Task[5];
-		for (int j = 0; j < 5; j++) {
-			Task t = new Task();
-			t.body = "task #" + j;
-			t.duedate =  new Date();
-			t.estimate = 1.5f;
-			t.priority = j * 2;
-			t.id = j;
-			tasks[j] = t;
-		}
-		
-		long shift = 1000 * 60 * 60 * 3;
-		int[] indexes = {0, 1, 2, 3, 4};
-		for (int i = 0; i < 4; i++) {
-			ArrayList<Task> s = new ArrayList<Task>();
-			shuffleArray(indexes);
-			
-			for (int j = 0; j < 5; j++) {
-				Task t = null;
-				try {
-					t = tasks[indexes[j]].clone();
-				} catch (CloneNotSupportedException e) {
-					e.printStackTrace();
-				}
-				
-				t.duedate = new Date(t.duedate.getTime() + (shift * j));
-				
-				s.add(t);
-			}
-			
-			assignments.add(s);
-		}
 	}
 	
 	static Random rnd = new Random();
@@ -188,6 +157,10 @@ public class SchedulesActivity extends Activity implements TabListener, OnItemCl
 		
 		// set the task and its view that will be updated after the dialog returns
 		currentlyUpdatedTask = adapter.getItem(arg2);
+//		if (!currentlyUpdatedTask.schedulledNow) {
+//			Toast.makeText(this, "Task Already Schedulled", Toast.LENGTH_SHORT).show();
+//			return;
+//		}
 		currentlyUpdatedTextView = (TextView)view.findViewById(R.id.task_date);
 		
 		// initialize date time slider with the the time of that task

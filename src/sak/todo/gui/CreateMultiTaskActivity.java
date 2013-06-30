@@ -3,6 +3,7 @@ package sak.todo.gui;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 
@@ -64,7 +65,7 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 	ArrayList<PointConstraint> Constraints;
 	boolean listofAddedTaskAppears;
 	public static final String PREFS_NAME = "MyPrefsFile";
-	protected static final boolean GA_ENABLED = false;
+	protected static final boolean GA_ENABLED = true;
 	// ArrayList<Constraint> constraints;
 	public SharedPreferences sharedPrefs;
 	private int screenWidth;
@@ -106,7 +107,6 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 		priorityhigh.setClickable(false);
 		bodyView.setEnabled(false);
 		deadLineView.setClickable(false);
-		dueDateView.setClickable(false);
 		CreateMultiTaskActivity.this.findViewById(R.id.SaveAll).setVisibility(View.GONE);
 		CreateMultiTaskActivity.this.findViewById(R.id.AddTask).setVisibility(View.GONE);
 		CreateMultiTaskActivity.this.findViewById(R.id.AddTask).setEnabled(false);
@@ -136,7 +136,6 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 		prioritylow.setClickable(true);
 		prioritymedium.setClickable(true);
 		deadLineView.setClickable(true);
-		dueDateView.setClickable(true);
 		CreateMultiTaskActivity.this.findViewById(R.id.SaveAll).setVisibility(View.VISIBLE);
 		CreateMultiTaskActivity.this.findViewById(R.id.AddTask).setVisibility(View.VISIBLE);
 		CreateMultiTaskActivity.this.findViewById(R.id.AddTask).setEnabled(true);
@@ -151,6 +150,12 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 //		((RelativeLayout)findViewById(R.id.RelativeLayout1)).addView(v);
 		listofAddedTaskAppears = false;
 		
+	}
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO Auto-generated method stub
+		super.onActivityResult(requestCode, resultCode, data);
+		finish();
 	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -174,9 +179,9 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 	    actionBar.setStackedBackgroundDrawable(new ColorDrawable(R.color.tabsColor));
 		
 		
-		Tab tab1= actionBar.newTab().setText("Quick Task").setTabListener(this);
-		Tab tab2= actionBar.newTab().setText("Single Task").setTabListener(this);
-		Tab tab3= actionBar.newTab().setText("Multi task").setTabListener(this);
+		Tab tab1= actionBar.newTab().setText("Quick Add").setTabListener(this);
+		Tab tab2= actionBar.newTab().setText("Add Task").setTabListener(this);
+		Tab tab3= actionBar.newTab().setText("Add Meeting").setTabListener(this);
 		actionBar.addTab(tab1);
 		actionBar.addTab(tab2);
 		actionBar.addTab(tab3);
@@ -190,7 +195,6 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 		prioritymedium = (Button) this.findViewById(R.id.ScrollViewParent).findViewById(R.id.rate_medium);
 		estimateView = (EditText) this.findViewById(R.id.ScrollViewParent).findViewById(R.id.editText1);
 		deadLineView = (Button) this.findViewById(R.id.ScrollViewParent).findViewById(R.id.deadline);
-		dueDateView = (Button) this.findViewById(R.id.ScrollViewParent).findViewById(R.id.duedate);
 
 		sharedPrefs = getSharedPreferences(PREFS_NAME, 0);
 		Constraints=new ArrayList<PointConstraint>();
@@ -290,11 +294,13 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 		    public void onGlobalLayout() {
 		        int heightDiff = activityRootView.getRootView().getHeight() - activityRootView.getHeight();
 		        if (heightDiff > 150) { // if more than 100 pixels, its probably a keyboard...
+				if(CreateMultiTaskActivity.this.findViewById(R.id.SaveAll)==null)return;
 		        	CreateMultiTaskActivity.this.findViewById(R.id.SaveAll).setVisibility(View.INVISIBLE);
 					CreateMultiTaskActivity.this.findViewById(R.id.AddTask).setVisibility(View.INVISIBLE);
 		        }
 		        else
 		        {
+				if(CreateMultiTaskActivity.this.findViewById(R.id.SaveAll)==null)return;
 		        	CreateMultiTaskActivity.this.findViewById(R.id.SaveAll).setVisibility(View.VISIBLE);
 					CreateMultiTaskActivity.this.findViewById(R.id.AddTask).setVisibility(View.VISIBLE);
 		        }
@@ -309,7 +315,24 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 		findViewById(R.id.SaveAll).setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Log.d("debug", "Save alll ........... ");
-
+				SVMAdapter svmAdapter;
+				Preference_Learner pl;
+				int numOfRuns;
+				try {
+					svmAdapter = new SVMAdapter(getApplicationContext());
+					svmAdapter.init();
+					numOfRuns = sharedPrefs.getInt("numberOfRuns", 0);
+					pl = new Preference_Learner(svmAdapter);
+				} catch (NameNotFoundException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+					
+					
 				ArrayList<ArrayList<Task>> assignments = null;
 				// GA 
 				if(GA_ENABLED){
@@ -318,23 +341,50 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 						tasks[i-1]=addedTasks.get(i);
 					}
 					Point[] constraints=new Point[Constraints.size()];
+					ArrayList<Point> points=new ArrayList<Point>();
 					for (int i = 0; i < Constraints.size(); i++) {
 						Task t1=Constraints.get(i).t1;
 						Task t2=Constraints.get(i).t2;
 						int index1=-1,index2=-1;
+						Point p=new Point(-1,-1);
 						for (int j = 0; j < tasks.length; j++) {
 							if(t1.body.equals(tasks[j].body)){
 								index1=j;
+								p.x=j;
+								if(p.y!=-1){
+									points.add(p);
+									break;
+								}
 							}
 							if(t2.body.equals(tasks[j].body)){
 								index2=j;
+								p.y=j;
+								if(p.x!=-1){
+									points.add(p);
+									break;
+								}
+								
+								
 							}
 						}
 						constraints[i]=new Point(index1, index2);
 					}
 					ScheduleTasks s=new ScheduleTasks(tasks, constraints);
 					assignments=s.getAssignments();
-					ArrayList<ArrayList<Task>> deletedTasks=new ArrayList<ArrayList<Task>>();
+					
+					ArrayList<ArrayList<Task>> deletedAssignments=new ArrayList<ArrayList<Task>>();
+					
+					for (int i = 0; i < points.size(); i++) {
+						Point p=points.get(i);
+						for (int j = 0; j < assignments.size(); j++) {
+							
+						
+							ArrayList<Task >assign1=assignments.get(j);
+							if(assign1.get(p.x).duedate.getTime()>assign1.get(p.y).duedate.getTime()){
+								deletedAssignments.add(assign1);
+							}
+						}
+					}
 					for (int i = 0; i < assignments.size(); i++) {
 						
 						for (int j = i+1; j < assignments.size(); j++) {
@@ -352,22 +402,55 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 								min=(long) ((double)((assign2.get(k).duedate.getTime()/15)+1)*15);
 								assign2.get(k).duedate.setTime(min);
 								
-								Log.d("debug", "assign1 "+assign1.get(k).duedate);
-								Log.d("debug", "assign2 "+assign2.get(k).duedate);
+								
 								if(Math.abs(assign1.get(k).duedate.getTime()-assign2.get(k).duedate.getTime())>0.15*60*60){// half an hour
 									deleted=false;
 									break;
 								}
 							}
 							if(deleted){
-								Log.d("debug", "deleted");
-								deletedTasks.add(assign2);
+								deletedAssignments.add(assign2);
 							}
 						}
 					}
-					for (int i = 0; i < deletedTasks.size(); i++) {
-						assignments.remove(deletedTasks.get(i));
+					
+					
+					for (int i = 0; i < deletedAssignments.size(); i++) {
+						assignments.remove(deletedAssignments.get(i));
 					}
+					
+					for (int i = 0; i < assignments.size(); i++) {
+						for (int j = 0; j < assignments.get(i).size(); j++) {
+							assignments.get(i).get(j).schedulledNow=true;
+						}
+					}
+					TasksIterator itr = Task.getScheduledTasks(new Date(System.currentTimeMillis()), new Date(Reasoner.INFINITY));
+					Task task = itr.nextTask();
+					ArrayList<Task> preset = new ArrayList<Task>();
+					while (task != null) {
+						preset.add(task);
+	 					task = itr.nextTask();
+					}
+					for (int i = 0; i < assignments.size(); i++) {
+						for (int p = 0; p < preset.size(); p++) {
+							assignments.get(i).add(preset.get(p));
+						}
+						Collections.sort(assignments.get(i));
+					}
+					deletedAssignments.clear();
+					
+					for (int i = 0; i < assignments.size(); i++) {
+						ArrayList<Task> assign=assignments.get(i);
+						for (int j = 0; j < assign.size()-1; j++) {
+							if(assign.get(j).duedate.getTime()+assign.get(j).estimate*60*1000>assign.get(j+1).duedate.getTime()){
+								deletedAssignments.add(assign);
+							}
+						}
+					}
+					for (int i = 0; i < deletedAssignments.size(); i++) {
+						assignments.remove(deletedAssignments.get(i));
+					}
+					
 					
 				}
 				else{
@@ -379,7 +462,7 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 						preset.add(task);
 	 					task = itr.nextTask();
 					}
-					Reasoner reasoner = Reasoner.instance();
+					Reasoner reasoner = new Reasoner(pl);
 					reasoner.setPresetTasks(preset);
 					
 						try {
@@ -388,60 +471,10 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-
-						SVMAdapter svmAdapter;
-						try {
-							Log.d("assignments length", assignments.size() + "");
-							svmAdapter = new SVMAdapter(getApplicationContext());
-
-							int numOfRuns = sharedPrefs.getInt("numberOfRuns", 0);
-							Preference_Learner pl = Preference_Learner.getInstance(assignments, svmAdapter, numOfRuns);
-							try {
-								svmAdapter.init();
-								assignments = pl.rank(pl.setcalenderFeatVector(assignments));
-
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-
-						} catch (NameNotFoundException e) {
-							e.printStackTrace();
-						}
 					
 
 				}
-				
 
-				if(GA_ENABLED){
-				
-				
-				
-				// amr-> Ranker
-				SVMAdapter svmAdapter;
-				try {
-					
-					if(assignments.size()>1){
-						Log.d("debug", assignments.size() + "");
-						svmAdapter = new SVMAdapter(getApplicationContext());
-
-						int numOfRuns = sharedPrefs.getInt("numberOfRuns", 0);
-						Preference_Learner pl = Preference_Learner.getInstance(assignments, svmAdapter, numOfRuns);
-						try {
-							svmAdapter.init();
-							assignments = pl.rank(pl.setcalenderFeatVector(assignments));
-							Log.d("debug", assignments.size() + "");
-						} catch (IOException e) {
-							Log.d("debug", "IOException "+e.getLocalizedMessage());
-							e.printStackTrace();
-					}
-					}
-
-				} catch (NameNotFoundException e) {
-					Log.d("debug", "Name not found"+e.getLocalizedMessage());
-					e.printStackTrace();
-				}
-				Log.d("debug", "here");
-				}
 				// output
 				for (int i = 0; i < assignments.size(); i++) {
 					Log.d("debug", "assignment: " + i);
@@ -454,9 +487,10 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 				}
 				
 				Intent intent = new Intent(CreateMultiTaskActivity.this, SchedulesActivity.class);
+				
 				intent.putExtra("assignments", assignments);
 
-				startActivity(intent);
+				startActivityForResult(intent,0);
 			}
 		});
 		findViewById(R.id.AddTask).setOnClickListener(new OnClickListener() {
@@ -594,9 +628,8 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 						task.setText(((TextView) view).getText());
 						
 						task.setTextSize(18);
-						task.setPadding(30, 0, 0, 0);
+						task.setPadding(0, 0, 30, 0);
 						
-						layoutBefore.findViewById(R.id.delete).setPadding(50, 0, 0, 0);
 						layoutBefore.findViewById(R.id.delete).setBackgroundResource(R.drawable.cancel);
 
 						view.setVisibility(View.VISIBLE);
@@ -628,7 +661,7 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 							task.setText(((TextView) view).getText());
 							
 							task.setTextSize(18);
-							layoutAfter.findViewById(R.id.textview).setPadding(30, 0, 0, 0);
+//							layoutAfter.findViewById(R.id.textview).setPadding(30, 0, 0, 0);
 							
 							task.setPadding(0, 0, 30, 0);
 							layoutAfter.findViewById(R.id.delete).setBackgroundResource(R.drawable.cancel);
@@ -815,7 +848,6 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 	private Button prioritylow,priorityhigh,prioritymedium;
 	private EditText estimateView;
 	private Button deadLineView;
-	private Button dueDateView;
 	private Button dateText;
 
 	private final DateSlider.OnDateSetListener mDateTimeSetListener = new DateSlider.OnDateSetListener() {
@@ -868,5 +900,6 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 		// TODO Auto-generated method stub
 		
 	}
+	
 
 }

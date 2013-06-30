@@ -46,6 +46,11 @@ public class ScheduleTasks {
 		for (int i = 0; i < tasks.length; i++) {
 			Log.d("debug", "Task "+tasks[i].toString());
 		}
+		Log.d("debug", "time slots num "+timeSlots.length);
+		for (int i = 0; i < timeSlots.length; i++) {
+			Log.d("debug", "time slot"+ timeSlots[i].getStart().toString());
+			Log.d("debug", "time slot"+ timeSlots[i].getDuration());
+		}
 		
 		for (int i = 0; i < PreferenceModel.PreferencesNum(); i++) {
 			Log.d("debug", "pref: "+i);
@@ -159,9 +164,16 @@ public class ScheduleTasks {
 		ArrayList<TimeSlot> list=new ArrayList<TimeSlot>();
 		Calendar c=Calendar.getInstance();
 		
+		Date lastTaskDate=getTimeNow();
+		lastTaskDate.setTime(lastTaskDate.getTime()-(long)maxDuration*1000);
+		TasksIterator ti=Task.getScheduledTasks(lastTaskDate, getTimeNow());
 		
-		
-		TasksIterator ti =Task.getScheduledTasks(getTimeNow(), maxDeadline);
+		if(ti.getCursor().getCount()==0){
+			ti =Task.getScheduledTasks(getTimeNow(), maxDeadline);
+		}
+		else {
+			ti =Task.getScheduledTasks(ti.nextTask().deadline, maxDeadline);
+		}
 		int count = ti.getCursor().getCount();
 		Task[] tasks = new Task[count];
 		Task t = ti.nextTask();
@@ -207,7 +219,6 @@ public class ScheduleTasks {
 				
 			}
 		}
-		
 		TimeSlot[] result=new TimeSlot[list.size()];
 		k=0;
 		while(list.size()>0){

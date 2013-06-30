@@ -64,8 +64,9 @@ public class HandleUnscheduledTasks {
 				/*
 				 * check invalid options (duration of task does not fit on time
 				 * slot Or, time slot starts after deadline of task.
+				 * 10 threshold for time slot.
 				 */
-				if (timeSlots[j].getDuration() < tasks[i].estimate*60
+				if (timeSlots[j].getDuration()+10 < tasks[i].estimate*60
 						|| timeSlots[j].getStart().after(tasks[i].deadline) 
 						|| timeSlots[j].getDuration()==-1) {
 					cost[i][j] = M;

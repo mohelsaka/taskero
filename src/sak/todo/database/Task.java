@@ -109,6 +109,7 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 	public float estimate; // estimate in hours
 	public int impression; // 0...10
 	public int priority; // 0...10
+	public boolean schedulledNow;
 
 	/**
 	 * Saves this task in the database: if the task is a newly created one (id =
@@ -538,6 +539,15 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 		t.deadline = this.deadline;
 		return t;
 	}
+	public Task clone(Task task) throws CloneNotSupportedException {
+		task.duedate = (Date)duedate.clone();
+		task.estimate = estimate;
+		task.body = body;
+		task.id=id;
+		task.priority = priority;
+		task.deadline = deadline;
+		return task;
+	}
 
 	public Task(Parcel in) {
 		this();
@@ -560,6 +570,7 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 			dest.writeLong(id);
 			dest.writeFloat(estimate);
 			dest.writeString(body);	
+			dest.writeInt(schedulledNow?1:0);
 		}
 	}
 
@@ -574,7 +585,7 @@ public class Task implements Comparable<Task>, Parcelable, Cloneable {
 		id = in.readLong();
 		estimate = in.readFloat();
 		body = in.readString();
-		
+		schedulledNow=in.readInt()==1?true:false;
 	}
 
 	@SuppressWarnings("rawtypes")

@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -77,9 +78,9 @@ public class SVMAdapter {
 //		f.close();
 		
 		// check if the model file exists or not before trying to create new one.
-		if (context.getFileStreamPath(model_file).exists()) {
-			return;
-		}
+//		if (context.getFileStreamPath(model_file).exists()) {
+//			return;
+//		}
 		
 		FileOutputStream f = context.openFileOutput(model_file, Context.MODE_PRIVATE);
 
@@ -218,7 +219,7 @@ public class SVMAdapter {
 		int count = f.read(buffer);
 		return new String(buffer, 0, count);
 	}
-	
+
 	/**
 	 * 
 	 * reads the model file and parses svm weights as an array of floats
@@ -227,10 +228,12 @@ public class SVMAdapter {
 	 * */
 	public HashMap<Integer, Float> getSVMWeights() throws IOException{
 		String model = dumpFile(model_file);
+		Log.d("model", model);
 		HashMap<Integer, Float> weights = new HashMap<Integer, Float>();
-		
-		int indexOfLastLine = model.lastIndexOf('\n');
-		String lastLine = model.substring(indexOfLastLine + 3); // skipping some chars
+		String temp[] = model.split("\n");
+		String lastLine = temp[temp.length-1];
+		lastLine = lastLine.substring(2, lastLine.length()-3);
+		System.out.println(lastLine);
 		String[] splits = lastLine.split(" ");
 		for (String weightPair : splits) {
 			String [] pair = weightPair.split(":");
