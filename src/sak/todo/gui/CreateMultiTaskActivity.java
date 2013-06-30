@@ -436,6 +436,19 @@ public class CreateMultiTaskActivity extends Activity implements TabListener {
 						}
 						Collections.sort(assignments.get(i));
 					}
+					deletedAssignments.clear();
+					
+					for (int i = 0; i < assignments.size(); i++) {
+						ArrayList<Task> assign=assignments.get(i);
+						for (int j = 0; j < assign.size()-1; j++) {
+							if(assign.get(j).duedate.getTime()+assign.get(j).estimate*60*1000>assign.get(j+1).duedate.getTime()){
+								deletedAssignments.add(assign);
+							}
+						}
+					}
+					for (int i = 0; i < deletedAssignments.size(); i++) {
+						assignments.remove(deletedAssignments.get(i));
+					}
 					
 					
 				}
