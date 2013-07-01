@@ -35,8 +35,8 @@ import android.widget.Toast;
 public class ServerUtilities {
 
 //	private static final String TASKERO_SERVER_ADDRESS = "http://ec2-54-218-15-43.us-west-2.compute.amazonaws.com:3000/";
-//	private static final String TASKERO_SERVER_ADDRESS = "http://taskero.herokuapp.com/";
-	private static final String TASKERO_SERVER_ADDRESS = "http://192.168.1.1:3000/";
+	private static final String TASKERO_SERVER_ADDRESS = "http://taskero.herokuapp.com/";
+//	private static final String TASKERO_SERVER_ADDRESS = "http://192.168.1.1:3000/";
 	private static final String USERS_ROUTE = "users.json";
 	private static final String MEETINGS_ROUTE = "meetings.json";
 	

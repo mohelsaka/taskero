@@ -129,6 +129,7 @@ OnClickListener, OnMenuItemClickListener, android.widget.PopupMenu.OnMenuItemCli
 						try {
 							String id = ServerUtilities.requestMeeting(meeting, email);
 							meeting.remote_id = Long.parseLong(id);
+							meeting.status = Meeting.PENDING;
 							meeting.save();
 							success = true;
 						} catch (Exception e) {

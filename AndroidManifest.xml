@@ -54,6 +54,9 @@
         <activity android:name="sak.todo.gui.MeetingDescision" >
         </activity>
         
+		<activity android:name="sak.todo.gui.MeetingReview" >
+        </activity>
+        
         
         <!-- GCM receiver -->
         <receiver

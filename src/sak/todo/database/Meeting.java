@@ -209,7 +209,8 @@ public class Meeting {
 	// saved to differentiate between declined and undeclined meetings;
 	public int status = PENDING;
 	public static final int PENDING = 0;
-	public static final int  CONFIRMED= 1;
+	public static final int  CONFIRMED = 1;
+	public static final int  DECLINED = 2;
 	
 	public String  collaborators = "";
 	
