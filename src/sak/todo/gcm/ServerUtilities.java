@@ -19,18 +19,24 @@ import org.json.JSONException;
 import org.json.simple.JSONObject;
 
 import sak.todo.database.Meeting;
+import sak.todo.gui.CreateMeeting;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Application;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 public class ServerUtilities {
 
-	private static final String TASKERO_SERVER_ADDRESS = "http://ec2-54-218-15-43.us-west-2.compute.amazonaws.com:3000/";
+//	private static final String TASKERO_SERVER_ADDRESS = "http://ec2-54-218-15-43.us-west-2.compute.amazonaws.com:3000/";
+//	private static final String TASKERO_SERVER_ADDRESS = "http://taskero.herokuapp.com/";
+	private static final String TASKERO_SERVER_ADDRESS = "http://192.168.1.1:3000/";
 	private static final String USERS_ROUTE = "users.json";
 	private static final String MEETINGS_ROUTE = "meetings.json";
 	
@@ -169,4 +175,46 @@ public class ServerUtilities {
         
         return (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK);
 	}
+
+	/**
+	 * This is the ultimate helper for all requests to the server that has to be run in background
+	 * */
+	public static void runInBackGround(Context context, final Runnable action, final Runnable onError, final Runnable onSuccess){
+	
+		// displaying in progress dialog
+		final ProgressDialog mDialog = new ProgressDialog(context);
+		mDialog.setMessage("requesting ...");
+		mDialog.setCancelable(false);
+		mDialog.show();
+		
+		final Toast failureToast = Toast.makeText(context, "Unable to send request", Toast.LENGTH_LONG);
+		final Toast successToast = Toast.makeText(context, "Meeing request has been sent!", Toast.LENGTH_LONG);
+		
+		AsyncTask.execute(new Runnable() {
+			public void run() {
+				boolean success = false;
+				try {
+					action.run();
+					success = true;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}finally{
+					mDialog.dismiss();
+					if (!success) {
+						failureToast.show();
+						if (onError != null) {
+							onError.run();
+						}
+					}else{
+						successToast.show();
+						if (onSuccess != null) {
+							onSuccess.run();
+						}
+					}
+				}
+			}
+		});
+	}
+	
+
 }

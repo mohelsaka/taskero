@@ -66,7 +66,7 @@ public class GCMUtilities {
      * @return server registration id, or empty string if the registration is not
      *         complete.
      */
-    private static String getRegistrationId(Context context) {
+    public static String getServerRegistrationId(Context context) {
         final SharedPreferences prefs = getGCMPreferences(context);
         String registrationId = prefs.getString(PROPERTY_SERVER_REG_ID, "");
         if (registrationId.length() == 0) {
@@ -84,7 +84,7 @@ public class GCMUtilities {
      * @return registration id, or empty string if the registration is not
      *         complete.
      */
-    public static String getServerRegistrationId(Context context) {
+    public static String getRegistrationId(Context context) {
         final SharedPreferences prefs = getGCMPreferences(context);
         String registrationId = prefs.getString(PROPERTY_REG_ID, "");
         if (registrationId.length() == 0) {

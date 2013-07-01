@@ -1,51 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
     android:background="@drawable/gradient_bc"
-    android:orientation="vertical" >
+    android:layout_height="fill_parent" >
 
-    <TextView
-        android:id="@+id/meeting_info"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        
-        android:text="@string/meeting_descision" />
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:padding="10dp" >
 
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.04" >
-		
-		<ListView
-		    android:id="@+id/listView1"
-		    android:layout_width="match_parent"
-		    android:layout_height="400dp"
-		    android:layout_weight="1"
-		    android:scrollbars="vertical" >
-
-    	</ListView>
-        <Button
-            android:id="@+id/accept_meeting"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/meeting_info"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-		    android:layout_alignParentBottom="true"
-		    android:layout_marginLeft="10dp"
-		    android:layout_marginBottom="5dp"
-            android:text="Accept" />
+            android:gravity="center"
+            android:text="@string/meeting_descision"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#900000" />
 
-        <Button
-            android:id="@+id/decline_meeting"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/meetingBody"
+            android:layout_width="fill_parent"
+            android:minHeight="60dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-		    android:layout_alignParentBottom="true"
-		     android:layout_marginRight="10dp"
-		    android:layout_marginBottom="5dp"
-            android:text="Decline" />
-        
-    </RelativeLayout>
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:background="#EEEEEE"
+            android:padding="5dp"
+            android:text="We have a meeting with the doctor today ... please all confirm to be be at the scheduled date"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="italic" />
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center" >
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:gravity="center"
+                android:text="Due date:"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/meetingDuedate"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="10 Jun 2013 10:00 am"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_marginTop="10dp"
+            android:id="@+id/textView4"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Collaborators:"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#900000" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:id="@+id/collaboratorsList"
+            android:layout_height="wrap_content" >
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="50dp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/accept_meeting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="acceptMeeting"
+                android:text="Accept" />
+
+            <Button
+                android:id="@+id/decline_meeting"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:onClick="declineMeeting"
+                android:text="Decline" />
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</ScrollView>

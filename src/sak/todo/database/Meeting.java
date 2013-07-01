@@ -47,6 +47,13 @@ public class Meeting {
 		m.loadByRemoteID();
 		return m;
 	}
+	
+	public static Meeting findById(long id){
+		Meeting m = new Meeting();
+		m.id = id;
+		m.loadByID();
+		return m;
+	}
 
 	public long loadByRemoteID() {
 		SQLiteDatabase db = DBHelper.instance.getReadableDatabase();
@@ -54,7 +61,30 @@ public class Meeting {
 
 		c.moveToFirst();
 		if (c.getCount() != 1) {
-			Log.d(TAG, "Can't be loaded info: mteeting_id = " + this.remote_id);
+			Log.d(TAG, "Can't be loaded info: mteeting_remote_id = " + this.remote_id);
+			return -1;
+		}
+
+		this.id = c.getLong(0);
+		this.body = c.getString(1);
+		this.status = c.getInt(2);
+		this.estimate = c.getFloat(3);
+		this.duedate = c.getLong(4);
+		this.remote_id = c.getLong(5);
+		this.collaborators = c.getString(6);
+		c.close();
+		
+		db.close();
+		return this.id;
+	}
+	
+	public long loadByID() {
+		SQLiteDatabase db = DBHelper.instance.getReadableDatabase();
+		Cursor c = db.rawQuery("Select * from meetings Where _id = ?", new String[] { "" + this.id });
+
+		c.moveToFirst();
+		if (c.getCount() != 1) {
+			Log.d(TAG, "Can't be loaded info: mteeting_id = " + this.id);
 			return -1;
 		}
 
@@ -193,19 +223,31 @@ public class Meeting {
 	
 	/**
 	 * This function takes an JSON object, parses into a meeting and saves it.
-	 * @return the id of the saved meeting
+	 * @return the meeting that has been saved
 	 * */
-	
-	public static long saveMeetingFromJSON(JSONObject meeting) throws JSONException{
+	//meeting={"body":"dhfgj","created_at":"2013-06-30T09:39:07Z","deadline":2147483647,"duedate":1372591820000,"duration":2.0,"id":7,"state":null,"updated_at":"2013-06-30T11:30:21Z","users":[{"email":"mohamed.elsaka2007@gmail.com"},{"email":"moamen.elgendy2010@gmail.com"}]}}
+	public static Meeting saveMeetingFromJSON(JSONObject meeting) throws JSONException{
 		Meeting m = new Meeting();
 		m.body = meeting.getString("body");
 		m.status = PENDING;
-		m.estimate = meeting.getLong("estimate");
-		m.collaborators = meeting.getString("collaborators");
+		m.estimate = meeting.getLong("duration");
+		
+		JSONArray ar = meeting.getJSONArray("users");
+		JSONArray collaboratorsArray = new JSONArray();
+		for (int i = 0; i < ar.length(); i++) {
+			JSONObject o = ar.getJSONObject(i);
+			collaboratorsArray.put(o.getString("email"));
+		}
+		m.collaborators = collaboratorsArray.toString();
+		
 		m.duedate = meeting.getLong("duedate");
-		m.remote_id = meeting.getLong("remote_id");
+		m.remote_id = meeting.getInt("id");
 		m.save();
-		return m.id;
+		
+		if(m.id > 0)
+			return m;
+		else
+			return null;
 	}
 		
 	
